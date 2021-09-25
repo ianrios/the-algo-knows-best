@@ -1,7 +1,8 @@
 import React from 'react'
 import AudioPlaylist from '../components/AudioPlaylist'
 
-export default function ResultsPage() {
+export default function ExperimentPage() {
+
     return (
         <div>
             <AudioPlaylist />
