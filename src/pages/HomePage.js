@@ -9,7 +9,7 @@ export default function HomePage() {
         <div className="row px-2">
           <div className="col-sm-12 col-md-9 bg-light rounded-2 mb-2">
             <p className="lead">
-              A short-form ambient concept album, designed for automated shuffling, allows listeners to craft new auditory experiences during each play.
+              This short-form ambient concept album, crafted for automated pseudo-random playlists, allows listeners to craft new auditory experiences during each play.
             </p>
             <p className="lead">
               Using machine learning, user-created listening patterns emerge from randomness based on preference, retention time, and skips, among other metrics built into modern-day shuffling algorithms such as song popularity and length.

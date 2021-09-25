@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+// import { connect } from 'react-redux'
 import { Switch, Route, NavLink, Link } from 'react-router-dom'
 
 import ExperimentPage from './pages/ExperimentPage';
@@ -8,6 +9,7 @@ import HomePage from './pages/HomePage';
 import Navbar from './components/Navbar';
 
 import './App.css';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -29,16 +31,9 @@ function App() {
           </Route>
         </Switch>
       </div>
-
-      <footer className="footer mt-auto py-3 bg-light">
-        <div className="container">
-          Site created using react{" - "}<a href="https://github.com/ianrios/the-algo-knows-best" target="_blank" rel="noreferrer" className="text-muted">GitHub</a>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
 
-
-
-export default App;
+export default App

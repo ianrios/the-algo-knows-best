@@ -1,22 +1,32 @@
 import React from 'react'
+import { Row, Col } from 'react-bootstrap'
 import AudioPlaylist from '../components/AudioPlaylist'
 
 export default function ExperimentPage() {
 
-    return (
-        <div>
-            <AudioPlaylist />
-            {/* <figure>
-                <figcaption>Listen to the Audio</figcaption>
-                <audio controls preload="auto">
-
-                    <source src="./audio/T0001.wav" type="audio/wav" />
-                    <source src="./audio/T0002.wav" type="audio/wav" />
-
-                    Your browser does not support the
-                    <code>audio</code> element.
-                </audio>
-            </figure> */}
-        </div>
-    )
+  return (
+    <>
+      <Row>
+        <Col>
+          <h1>
+            Random Playlist Stream
+          </h1>
+          <p>
+            Listen to the stream to participate; feel free to re-shuffle the playlist, rate a song, replay, skip, or stop listening whenever!
+          </p>
+        </Col>
+      </Row>
+      <Row>
+        <Col sm="12" md={{ span: 6, offset: 3 }} lg={{ span: 4, offset: 4 }}>
+          <AudioPlaylist />
+        </Col>
+      </Row>
+      <Row>
+        <Col className="mt-4">
+          <p>You are currently listening to a traditional Fisher-Yates Shuffle Algorithm.</p>
+          <p>All data is recorded and will affect the resulting algorithmically generated playlist in real time.</p>
+        </Col>
+      </Row>
+    </>
+  )
 }
