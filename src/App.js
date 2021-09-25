@@ -1,15 +1,14 @@
-import React, { useEffect } from 'react'
-// import { connect } from 'react-redux'
-import { Switch, Route, NavLink, Link } from 'react-router-dom'
+import React from 'react'
+import { Switch, Route } from 'react-router-dom'
 
 import ExperimentPage from './pages/ExperimentPage';
 import ResultsPage from './pages/ResultsPage';
 import InfoPage from './pages/InfoPage';
 import HomePage from './pages/HomePage';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 import './App.css';
-import Footer from './components/Footer';
 
 function App() {
   return (
