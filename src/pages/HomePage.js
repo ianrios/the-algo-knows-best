@@ -15,15 +15,25 @@ export default function HomePage() {
               Using machine learning, user-created listening patterns emerge from randomness based on preference, retention time, and skips, among other metrics built into modern-day shuffling algorithms such as song popularity and length.
             </p>
             <p className="lead">
-            <Link to="/info" className="link-secondary">Read more...</Link>
+              <Link to="/info" className="link-secondary">Read more...</Link>
             </p>
             <hr />
             <p className="lead">
               <Link to="/stream" className="link-primary">Listen now</Link> to contribute to the live playlist generation, or <Link to="results" className="link-secondary">view the data</Link> change in real time.
             </p>
-
           </div>
-          <div className="col-sm-12 col-md-3 mt-auto">
+
+
+          <div className="col-sm-12 col-md-3 d-block d-sm-none mt-auto">
+            <div className="row">
+              <div className="col d-flex justify-content-end">
+                <Link to='/stream' className="btn btn-primary fw-bold" id="padded-btn">Participate Now</Link>
+                <Link to='/results' className="btn btn-outline-secondary">View Results</Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-sm-12 col-md-3 d-sm-block d-none mt-auto">
             <div className="row">
               <div className="col-12 d-flex justify-content-end">
                 <Link to='/stream' className="btn btn-primary fw-bold">Participate Now</Link>
@@ -35,6 +45,8 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+
+
         </div>
       </div>
     </div>

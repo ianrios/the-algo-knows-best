@@ -6,9 +6,10 @@ export default function ResultsPage() {
         return (
             <tr key={index}>
                 <th scope="row">{item + 1}</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
+                <td>og order</td>
+                <td>listeners</td>
+                <td>likes</td>
+                <td>plays</td>
             </tr>
         )
     })
@@ -17,9 +18,18 @@ export default function ResultsPage() {
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th scope="col">ML Ranking</th>
-                        <th scope="col">Tracklist</th>
-                        <th scope="col">Popularity</th>
+                        <th scope="col">
+                            <span className="d-none d-md-block">ML</span>
+                            {" "}Ranking{" "}
+                            <span className="d-none d-lg-block">(Popularity)</span>
+                        </th>
+                        <th scope="col">
+                            <span className="d-none d-lg-block">Original</span>
+                            <span className="d-md-none d-sm-block">Order</span>
+                            <span className="d-none d-md-block">Tracklist</span>
+                        </th>
+                        <th scope="col">Listeners</th>
+                        <th scope="col">Likes</th>
                         <th scope="col">Plays</th>
                     </tr>
                 </thead>
