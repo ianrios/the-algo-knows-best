@@ -13,6 +13,7 @@ export default function ExperimentPage() {
                         </th>
                         <th scope="col">Algorithmic Order</th>
                         <th scope="col">Original Order</th>
+                        <th scope="col">Popularity</th>
                         <th scope="col">Song Name</th>
                     </tr>
                 </thead>

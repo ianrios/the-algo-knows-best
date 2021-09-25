@@ -9,7 +9,7 @@ import './App.css';
 
 function App() {
   return (
-    <div className="App">
+    <div className="App d-flex flex-column min-vh-100">
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid">
           <NavLink className="navbar-brand" exact activeClassName="active" to='/'>
@@ -44,7 +44,7 @@ function App() {
           </div>
         </div>
       </nav>
-      <div className="container">
+      <div className="container flex-fill">
         <Switch>
           <Route path="/info">
             <InfoPage />
@@ -60,6 +60,12 @@ function App() {
           </Route>
         </Switch>
       </div>
+
+      <footer class="footer mt-auto py-3 bg-light">
+        <div class="container">
+          <span class="text-muted">Place sticky footer content here.</span>
+        </div>
+      </footer>
     </div>
   );
 }
