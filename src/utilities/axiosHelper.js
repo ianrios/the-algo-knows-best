@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { API_URL } from './constants.js'
 
 export function axiosHelper(props) {
 	const {
@@ -10,14 +11,15 @@ export function axiosHelper(props) {
 		failureMethod = e => console.log(e)
 	} = props; // setting default prop values
 
-	const API_URL = 'https://algoknows-ianrios529550.codeanyapp.com'
-
 	return axios({
 		method,
 		url: API_URL + url,
 		headers: {
 			'Content-Type': 'application/json;charset=UTF-8',
 			'Access-Control-Allow-Origin': '*',
+			// 'Access-Control-Allow-Headers': 'Content-Type',
+			// 'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
+			// 'Access-Control-Allow-Credentials': true,
 			'Accept': 'application/json',
 			'Authorization': 'Bearer ' + token
 		},

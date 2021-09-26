@@ -7,7 +7,7 @@ export default function ResultsPage() {
 	const data = [...Array(16).keys()]
 	const mappedData = data.map((item, index) => {
 		return (
-			<tr key={index} className={index === 2 && "table-primary"}>
+			<tr key={index} className={`${index === 2 ? "table-primary" : ""}`}>
 				<th scope="row">{item + 1}</th>
 				{/* <td>
 					<div className="spinner-grow" role="status">

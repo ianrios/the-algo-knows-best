@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { axiosHelper } from './axiosHelper'
 import history from './history'
+import { API_URL, client_secret } from './constants.js'
 
 const DatabaseContext = createContext({});
 
@@ -26,19 +27,22 @@ export const DatabaseHelper = () => {
     // console.log(lsToken)
     if (lsToken) {
       axiosHelper({
-        url: '/api/user',
+        url: '/api/auth/user',
         successMethod: saveUserData,
         failureMethod: destroyToken,
         token: lsToken
       })
       setToken(lsToken)
     }
+    else {
+      register({})
+    }
   }, [])
 
   function getUser(token) {
     axiosHelper({
       method: 'get',
-      url: '/api/user',
+      url: '/api/auth/user',
       successMethod: saveUserData,
       token: token
     })
@@ -52,9 +56,9 @@ export const DatabaseHelper = () => {
 
   function saveToken(res) {
     let APItoken; // Initalize variable
-    if (res.config.url === "https://finalproject-contactsmiththay315914.codeanyapp.com/api/register") {
+    if (res.config.url === API_URL + "/api/auth/register") {
       APItoken = res.data.data.token
-    } else if (res.config.url === "https://finalproject-contactsmiththay315914.codeanyapp.com/oDatabase/token") {
+    } else if (res.config.url === API_URL + "/oauth/token") {
       APItoken = res.data.access_token
     }
 
@@ -66,7 +70,7 @@ export const DatabaseHelper = () => {
     axiosHelper({
       data: registrationData,
       method: 'post',
-      url: '/api/register',
+      url: '/api/auth/register',
       successMethod: saveToken,
     })
   }
@@ -76,18 +80,18 @@ export const DatabaseHelper = () => {
       data: {
         grant_type: "password",
         client_id: "2",
-        client_secret: "n5sSon1N2Zrcg9mLIspncnApITp7LNf0rAQGqnvW",
+        client_secret,
         ...loginData
       },
       method: 'post',
-      url: '/oAuth/token',
+      url: '/oauth/token',
       successMethod: saveToken,
     })
   }
 
   function logout() {
     axiosHelper({
-      url: '/api/logout',
+      url: '/api/auth/logout',
       successMethod: destroyToken,
       token
     })
