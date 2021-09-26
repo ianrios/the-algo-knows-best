@@ -1,5 +1,6 @@
 import React from 'react'
 import { Row, Col } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
 import AudioPlaylist from '../components/AudioPlaylist'
 
 export default function ExperimentPage() {
@@ -22,9 +23,10 @@ export default function ExperimentPage() {
         </Col>
       </Row>
       <Row>
-        <Col className="mt-4">
+        <Col className="my-4">
           <p>You are currently listening to a traditional Fisher-Yates Shuffle Algorithm.</p>
           <p>All data is recorded and will affect the resulting algorithmically generated playlist in real time.</p>
+          <Link to='/results' className="link-dark">View Results</Link>
         </Col>
       </Row>
     </>

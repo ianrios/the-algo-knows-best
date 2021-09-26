@@ -23,7 +23,6 @@ export default function HomePage() {
             </p>
           </div>
 
-
           <div className="col-sm-12 col-md-3 d-block d-sm-none mt-auto">
             <div className="row">
               <div className="col d-flex justify-content-end">
@@ -45,7 +44,6 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-
 
         </div>
       </div>

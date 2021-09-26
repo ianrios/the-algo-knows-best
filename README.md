@@ -4,14 +4,11 @@ Working Demo: [the-algorithm-knows-best.web.app](https://the-algorithm-knows-bes
 
 Google Docs Paper: [Describing Process](https://docs.google.com/document/d/1tj1QeCOzNzpLD_msm5PgIIS08yObY-NYgv8jGpOjEy0/edit?usp=sharing)
 
-
-# Getting Started with Create React App
+## Getting Started
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
-
-In the project directory, you can run:
+Once downloaded, in the project directory, you can run:
 
 ### `npm start`
 
