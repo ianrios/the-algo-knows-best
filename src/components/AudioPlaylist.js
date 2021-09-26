@@ -1,67 +1,100 @@
 import React, { useState, useEffect } from 'react';
 import ReactAudioPlayer from 'react-audio-player';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { useHistory } from 'react-router';
 import Modal from './Modal'
 
 export default function AudioPlaylist(props) {
 
-  function fisherYatesShuffle(array) {
-    let currentIndex = array.length, randomIndex;
+  const history = useHistory()
+
+  const shufflePlaylist = arr => {
+    // Standard Fisher Yates Shuffle Algorithm
+    let currIdx = arr.length, randIdx;
 
     // While there remain elements to shuffle...
-    while (currentIndex !== 0) {
+    while (currIdx !== 0) {
 
       // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
+      randIdx = Math.floor(Math.random() * currIdx);
+      currIdx--;
 
       // And swap it with the current element.
-      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+      [arr[currIdx], arr[randIdx]] = [arr[randIdx], arr[currIdx]];
     }
 
-    return array;
+    return arr;
   }
 
-  const orderedPlaylist = [...Array(16).keys()].map((item, index) => {
+  const generatePlaylist = () => [...Array(16).keys()].map((item, index) => {
     const name = item + 1
     return (
       {
-        id: index,
-        sources: {
-          wav: `./audio/T00${name > 9 ? name : "0" + name}.wav`
-        },
+        id: index, //created on backend, generated for front end using index
+        // order: to be created based on final resulting index in array
+        // playlist_id: to be created on backend,
+        placement_liked: 0, // 0 neutral, 1 positive, -1 negative
+        num_plays: 0.0, // percent listened based on skips, pauses, loops, or restarts
+        track: {
+          id: index,
+          file_name: `./audio/T00${name > 9 ? name : "0" + name}.wav`
+        }
       }
     )
   })
+
+  const playlist = generatePlaylist()
+
+  const [shuffledPlaylist, setShuffledPlaylist] = useState(shufflePlaylist(playlist))
+
+
   const [currentSongIndex, setCurrentSongIndex] = useState(0)
   const [muted, setMuted] = useState(false)
   const [looped, setLooped] = useState(false)
   const [likedStatus, setLikedStatus] = useState("neutral")
-  const [shuffledPlaylist, setShuffledPlaylist] = useState(orderedPlaylist)
-  const [showModal, setShowModal] = useState(false);
-  const handleCloseModal = () => setShowModal(false);
-  const handleShowModal = () => setShowModal(true);
+
+
+  // Ending Modal Code
+  const [showEndingModal, setShowEndingModal] = useState(false);
+  const handleShowEndingModal = () => setShowEndingModal(true);
   const closeAndRepeat = () => {
     console.log("automatically restart playlist")
-    setShowModal(true);
+    setShowEndingModal(false);
+    setCurrentSongIndex(prevIndex => 0)
+
   }
   const viewResults = () => {
     console.log("view results")
-    setShowModal(true);
+    setShowEndingModal(false);
+    history.push('/results')
+  }
+
+  // Shuffle Modal Code
+  const [showShuffleModal, setShowShuffleModal] = useState(false);
+  const handleShowShuffleModal = () => setShowShuffleModal(true);
+  const closeShuffleModal = () => {
+    console.log("close shuffle modal")
+    setShowShuffleModal(false);
+  }
+  const confirmShuffleModal = () => {
+    console.log("confirm shuffle")
+    setShowEndingModal(false);
+    setShowShuffleModal(false);
+    handleShuffle()
   }
 
   const handleShuffle = () => {
     console.log("shuffling")
-    setShuffledPlaylist(prevPlaylist => [...fisherYatesShuffle(orderedPlaylist)])
+    setShuffledPlaylist(prevPlaylist => [...shufflePlaylist(prevPlaylist)])
     setCurrentSongIndex(prevIndex => 0)
   }
-  const handleEnded = (currentlyGenerating) => {
+  const handleEnded = () => {
     console.log("ended")
     if (!looped) {
       setCurrentSongIndex(prevIndex => {
-        if (prevIndex + 1 >= orderedPlaylist.length) {
-          if (currentlyGenerating) {
-            handleShowModal()
+        if (prevIndex + 1 >= playlist.length) {
+          if (!!props.generating) {
+            handleShowEndingModal()
           }
           return 0
         }
@@ -69,16 +102,12 @@ export default function AudioPlaylist(props) {
       })
     }
   }
-  const handleLoop = () => {
-    console.log("loop")
-    setLooped(prev => !prev)
-  }
-  const handleSkip = (currentlyGenerating) => {
+  const handleSkip = () => {
     console.log("skip")
     setCurrentSongIndex(prevIndex => {
-      if (prevIndex + 1 >= orderedPlaylist.length) {
-        if (currentlyGenerating) {
-          handleShowModal()
+      if (prevIndex + 1 >= playlist.length) {
+        if (!!props.generating) {
+          handleShowEndingModal()
         }
         return 0
       }
@@ -93,6 +122,10 @@ export default function AudioPlaylist(props) {
       }
       return prevIndex - 1
     })
+  }
+  const handleLoop = () => {
+    console.log("loop")
+    setLooped(prev => !prev)
   }
   const handleMuted = () => {
     console.log("muted")
@@ -129,12 +162,6 @@ export default function AudioPlaylist(props) {
     setLikedStatus(prevStatus => prevStatus === "negative" ? "neutral" : "negative")
   }
 
-
-
-  useEffect(() => {
-    handleShuffle()
-  }, [])
-
   useEffect(() => {
     setLikedStatus(prevStatus => "neutral")
   }, [currentSongIndex])
@@ -159,11 +186,11 @@ export default function AudioPlaylist(props) {
 
   return (
     <>
-      {!!props.result ?
+      {!!!props.generating ?
         <>
-          <h5>Currently Playing: Song {currentSong.id + 1}</h5>
+          <h5>Currently Playing: Song {currentSong.track.id + 1}</h5>
           <ReactAudioPlayer
-            onEnded={() => handleSkip(!!props.result)}
+            onEnded={handleEnded}
             onListen={handleListen}
             onAbort={handleAbort}
             onPause={handlePause}
@@ -171,10 +198,10 @@ export default function AudioPlaylist(props) {
             onSeeked={handleSeeked}
             onVolumeChanged={handleVolumeChanged}
             muted={muted}
-            loop={true}
+            loop={false}
             autoPlay
             className="w-100 rounded"
-            src={currentSong.sources.wav}
+            src={currentSong.track.file_name}
             controls
           />
         </>
@@ -187,26 +214,25 @@ export default function AudioPlaylist(props) {
           </ul>
         </div> */}
           <img src="./images/album_art.jpg" className="card-img-top" alt="artwork" />
-          {/* TODO: instead of using the album art, 
-        show the current playlist order, 
-         an indicator showing where we are,
-         and badges to show how many times we have listened to a specific song */}
+          {/* TODO: add info for song artwork */}
           <div className="card-body">
-            <h5 className="card-title">Song {currentSong.id + 1}</h5>
+            <h5 className="card-title">Song {currentSong.track.id + 1}</h5>
             <p className="card-text">Original track order used for song title</p>
             <p className="card-text d-flex flex-column">
               <small className="text-muted">
-                Track {currentSongIndex + 1} of {orderedPlaylist.length} in shuffled playlist
+                Track {currentSongIndex + 1} of {playlist.length} in shuffled playlist
               </small>
               <small className="text-muted">
                 <span class="badge bg-secondary rounded-pill float-right">
-                  {orderedPlaylist.length - currentSongIndex - 1}</span> songs left
+                  {playlist.length - currentSongIndex - 1}</span> songs left
               </small>
+              {/* TODO: move like/dislike song here */}
+              {/* TODO: add ability to like/dislike placement here */}
             </p>
           </div>
           <div className="card-footer d-flex justify-content-between">
             <ReactAudioPlayer
-              onEnded={() => handleSkip(!!props.result)}
+              onEnded={handleEnded}
               onListen={handleListen}
               onAbort={handleAbort}
               onPause={handlePause}
@@ -217,13 +243,14 @@ export default function AudioPlaylist(props) {
               loop={looped}
               autoPlay
               className="w-100 rounded"
-              src={currentSong.sources.wav}
+              src={currentSong.track.file_name}
               controls
             />
           </div>
           <div className="card-footer d-flex justify-content-between">
 
             <div className="btn-group" role="group" aria-label="playlist controls">
+              {/* TODO: throw modal for shuffling, let user know what they are about to do */}
               <OverlayTrigger
 
                 placement="top"
@@ -233,7 +260,7 @@ export default function AudioPlaylist(props) {
                   </Tooltip>
                 }
               >
-                <button type="button" className="btn btn-outline-primary" onClick={handleShuffle}>
+                <button type="button" className="btn btn-outline-primary" onClick={handleShowShuffleModal}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-shuffle" viewBox="0 0 16 16">
                     <path fillRule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z" />
                     <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z" />
@@ -283,7 +310,7 @@ export default function AudioPlaylist(props) {
                   </Tooltip>
                 }
               >
-                <button type="button" className="btn btn-outline-primary" onClick={() => handleSkip(!!props.result)}>
+                <button type="button" className="btn btn-outline-primary" onClick={handleSkip}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-skip-forward" viewBox="0 0 16 16">
                     <path d="M15.5 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V8.752l-6.267 3.636c-.52.302-1.233-.043-1.233-.696v-2.94l-6.267 3.636C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696L7.5 7.248v-2.94c0-.653.713-.998 1.233-.696L15 7.248V4a.5.5 0 0 1 .5-.5zM1 4.633v6.734L6.804 8 1 4.633zm7.5 0v6.734L14.304 8 8.5 4.633z" />
                   </svg>
@@ -319,10 +346,26 @@ export default function AudioPlaylist(props) {
         </div>
       }
       <Modal
-        handleClose={handleCloseModal}
-        viewResults={viewResults}
-        closeAndRepeat={closeAndRepeat}
-        show={showModal}
+        handleClose={closeAndRepeat}
+        primaryButtonClickHandler={viewResults}
+        secondaryButtonClickHandler={closeAndRepeat}
+        infoButtonClickHandler={confirmShuffleModal}
+        titleText={"End of Playlist"}
+        bodyText={"You have listened through the randomly generated playlist. Feel free to view the results, or generate a new playlist. If you close the modal without choosing an option, the playlist you were crafted will continue to play on loop."}
+        primaryBtnText={"View Results"}
+        secondaryBtnText={"Close and Continue Listening"}
+        infoBtnText={"Generate New Experience"}
+        show={showEndingModal}
+      />
+      <Modal
+        handleClose={closeShuffleModal}
+        primaryButtonClickHandler={confirmShuffleModal}
+        secondaryButtonClickHandler={closeShuffleModal}
+        titleText={"New Playist?"}
+        bodyText={"By pressing the shuffle button, your listening experience will be re-crafted with a new randomly generated tracklist."}
+        primaryBtnText={"Continue"}
+        secondaryBtnText={"Back"}
+        show={showShuffleModal}
       />
     </>
   )

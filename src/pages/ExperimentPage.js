@@ -19,7 +19,7 @@ export default function ExperimentPage() {
       </Row>
       <Row>
         <Col sm="12" md={{ span: 6, offset: 3 }} lg={{ span: 4, offset: 4 }}>
-          <AudioPlaylist />
+          <AudioPlaylist generating />
         </Col>
       </Row>
       <Row>

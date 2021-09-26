@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router } from 'react-router-dom'
+import { DatabaseProvider } from './utilities/DatabaseContext'
+import history from './utilities/history'
+import ScrollToTop from './components/ScrollToTop'
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';
@@ -11,9 +14,14 @@ import './index.css';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Router>
-      <App />
-    </Router>
+    <DatabaseProvider>
+      <Router
+      // history={history}
+      >
+        <ScrollToTop />
+        <App />
+      </Router>
+    </DatabaseProvider>
   </React.StrictMode>
   , document.getElementById('root')
 );
