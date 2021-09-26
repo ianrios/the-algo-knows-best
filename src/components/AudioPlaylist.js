@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import ReactAudioPlayer from 'react-audio-player';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useHistory } from 'react-router';
-import Modal from './Modal'
+import Modal from './Modal';
+import { useDatabase } from '../utilities/DatabaseContext';
 
 export default function AudioPlaylist(props) {
+
+  const { savePlaylist } = useDatabase()
 
   const history = useHistory()
 
@@ -76,6 +79,14 @@ export default function AudioPlaylist(props) {
     console.log("close shuffle modal")
     setShowShuffleModal(false);
   }
+  const handleShuffle = () => {
+    console.log("shuffling")
+    setShuffledPlaylist(prevPlaylist => {
+      savePlaylist(prevPlaylist)
+      return [...shufflePlaylist(prevPlaylist)]
+    })
+    setCurrentSongIndex(prevIndex => 0)
+  }
   const confirmShuffleModal = () => {
     console.log("confirm shuffle")
     setShowEndingModal(false);
@@ -83,11 +94,6 @@ export default function AudioPlaylist(props) {
     handleShuffle()
   }
 
-  const handleShuffle = () => {
-    console.log("shuffling")
-    setShuffledPlaylist(prevPlaylist => [...shufflePlaylist(prevPlaylist)])
-    setCurrentSongIndex(prevIndex => 0)
-  }
   const handleEnded = () => {
     console.log("ended")
     if (!looped) {
@@ -166,6 +172,14 @@ export default function AudioPlaylist(props) {
     setLikedStatus(prevStatus => "neutral")
   }, [currentSongIndex])
 
+  useEffect(() => {
+    // Component Will Unmount  
+    return function cleanup() {
+      console.log("cleaning up")
+      savePlaylist(shuffledPlaylist)
+    };
+  }, []);
+
 
   const currentSong = shuffledPlaylist[currentSongIndex]
   console.log(currentSong)
@@ -175,11 +189,11 @@ export default function AudioPlaylist(props) {
   //   return (
   //     <li
   //       key={index}
-  //       class={"list-group-item d-flex justify-content-between align-items-center " +
+  //       className={"list-group-item d-flex justify-content-between align-items-center " +
   //         index === currentSongIndex && "bg-primary"
   //       }
   //     >
-  //       Song {item.id} <span class="badge bg-secondary rounded-pill float-right">14</span>
+  //       Song {item.id} <span className="badge bg-secondary rounded-pill float-right">14</span>
   //     </li>
   //   )
   // })
@@ -199,9 +213,10 @@ export default function AudioPlaylist(props) {
             onVolumeChanged={handleVolumeChanged}
             muted={muted}
             loop={false}
-            autoPlay
-            className="w-100 rounded"
             src={currentSong.track.file_name}
+            listenInterval={30000}
+            className="w-100 rounded"
+            autoPlay
             controls
           />
         </>
@@ -209,7 +224,7 @@ export default function AudioPlaylist(props) {
         <div className="card">
           {/* <div className="card-header">
           <h4>Your Current Playlist</h4>
-          <ul class="list-group ">
+          <ul className="list-group ">
             {currentPlaylist}
           </ul>
         </div> */}
@@ -223,7 +238,7 @@ export default function AudioPlaylist(props) {
                 Track {currentSongIndex + 1} of {playlist.length} in shuffled playlist
               </small>
               <small className="text-muted">
-                <span class="badge bg-secondary rounded-pill float-right">
+                <span className="badge bg-secondary rounded-pill float-right">
                   {playlist.length - currentSongIndex - 1}</span> songs left
               </small>
               {/* TODO: move like/dislike song here */}
@@ -241,9 +256,10 @@ export default function AudioPlaylist(props) {
               onVolumeChanged={handleVolumeChanged}
               muted={muted}
               loop={looped}
-              autoPlay
-              className="w-100 rounded"
               src={currentSong.track.file_name}
+              listenInterval={30000}
+              className="w-100 rounded"
+              autoPlay
               controls
             />
           </div>

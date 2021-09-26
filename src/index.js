@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router } from 'react-router-dom'
-import { DatabaseProvider } from './utilities/DatabaseContext'
-import history from './utilities/history'
+
+// import history from './utilities/history'
+import App from './App';
 import ScrollToTop from './components/ScrollToTop'
+import { DatabaseProvider } from './utilities/DatabaseContext'
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';

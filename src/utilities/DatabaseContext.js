@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { axiosHelper } from './axiosHelper'
-import history from './history'
+// import history from './history'
 import { API_URL, client_secret } from './constants.js'
 
 const DatabaseContext = createContext({});
@@ -20,39 +20,6 @@ export const DatabaseHelper = () => {
     window.localStorage.removeItem('token')
     // history.replace('/')
   }
-
-  // retaining user login information
-  useEffect(() => {
-    let lsToken = window.localStorage.getItem('token');
-    // console.log(lsToken)
-    if (lsToken) {
-      axiosHelper({
-        url: '/api/auth/user',
-        successMethod: saveUserData,
-        failureMethod: destroyToken,
-        token: lsToken
-      })
-      setToken(lsToken)
-    }
-    else {
-      register({})
-    }
-  }, [])
-
-  function getUser(token) {
-    axiosHelper({
-      method: 'get',
-      url: '/api/auth/user',
-      successMethod: saveUserData,
-      token: token
-    })
-  }
-
-  useEffect(() => {
-    if (token.length > 0) {
-      getUser()
-    }
-  }, [token])
 
   function saveToken(res) {
     let APItoken; // Initalize variable
@@ -97,7 +64,49 @@ export const DatabaseHelper = () => {
     })
   }
 
-  return { token, userData, register, login, logout }
+  function savePlaylist(playlistData) {
+    axiosHelper({
+      data: playlistData,
+      method: 'post',
+      url: '/api/playlist/save',
+      successMethod: saveToken,
+    })
+  }
+
+  function getUser(token) {
+    axiosHelper({
+      method: 'get',
+      url: '/api/auth/user',
+      successMethod: saveUserData,
+      token: token
+    })
+  }
+
+  // retaining user login information
+  useEffect(() => {
+    let lsToken = window.localStorage.getItem('token');
+    // console.log(lsToken)
+    if (lsToken) {
+      axiosHelper({
+        url: '/api/auth/user',
+        successMethod: saveUserData,
+        failureMethod: destroyToken,
+        token: lsToken
+      })
+      setToken(lsToken)
+    }
+    else {
+      register({})
+    }
+  }, [])
+
+  useEffect(() => {
+    if (token.length > 0) {
+      getUser()
+    }
+  }, [token])
+
+  return { token, userData, register, login, logout, savePlaylist }
 }
 
 // custom Provider component
