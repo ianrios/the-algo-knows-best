@@ -16,7 +16,7 @@ export const generateOrderedPlaylist = () => [...Array(16).keys()].map((item, in
 })
 
 export const generateAlgorithmicPlaylist = (playlistData, setResult) => {
-    // look at playlist data and rank items based on popularity, retention time, order, listeners, and more
+    // TODO: look at playlist data and rank items based on popularity, retention time, order, listeners, and more
 
     let arr = []
 

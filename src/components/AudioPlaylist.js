@@ -226,7 +226,6 @@ export default function AudioPlaylist(props) {
           </ul>
         </div> */}
           <img src="./images/album_art.jpg" className="card-img-top" alt="artwork" />
-          {/* TODO: add info for song artwork */}
           <div className="card-body">
             <h5 className="card-title">Song {currentSong.track.id + 1}</h5>
             <p className="card-text">Original track order used for song title</p>
@@ -261,11 +260,8 @@ export default function AudioPlaylist(props) {
             />
           </div>
           <div className="card-footer d-flex justify-content-between">
-
             <div className="btn-group" role="group" aria-label="playlist controls">
-              {/* TODO: throw modal for shuffling, let user know what they are about to do */}
               <OverlayTrigger
-
                 placement="top"
                 overlay={
                   <Tooltip id={`tooltip-top`}>
@@ -281,7 +277,6 @@ export default function AudioPlaylist(props) {
                 </button>
               </OverlayTrigger>
               <OverlayTrigger
-
                 placement="top"
                 overlay={
                   <Tooltip id={`tooltip-top`}>
@@ -300,7 +295,6 @@ export default function AudioPlaylist(props) {
 
             <div className="btn-group mx-2" role="group" aria-label="audio controls">
               <OverlayTrigger
-
                 placement="top"
                 overlay={
                   <Tooltip id={`tooltip-top`}>
@@ -315,7 +309,6 @@ export default function AudioPlaylist(props) {
                 </button>
               </OverlayTrigger>
               <OverlayTrigger
-
                 placement="top"
                 overlay={
                   <Tooltip id={`tooltip-top`}>
@@ -330,8 +323,6 @@ export default function AudioPlaylist(props) {
                 </button>
               </OverlayTrigger>
             </div>
-
-
             <div className="btn-group" role="group" aria-label="popularity controls">
               <button type="button" className="btn btn-outline-primary" onClick={handleLike}>
                 {(likedStatus === "neutral" || likedStatus === "negative") && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-hand-thumbs-up" viewBox="0 0 16 16">

@@ -22,6 +22,7 @@ export default function ResultsPage() {
 		}, 60000); // update once per minute
 	}, [])
 
+	// TODO: map the rest of these table items
 	const mappedData = algorithmicPlaylist.map((item, index) => {
 		console.log(item)
 		return (
