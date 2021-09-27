@@ -1,23 +1,41 @@
-import React from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import AudioPlaylist from '../components/AudioPlaylist'
+import { useDatabase } from '../utilities/DatabaseContext'
+import { generateAlgorithmicPlaylist } from '../utilities/algorithmicPlaylistGenerator'
 
 export default function ResultsPage() {
-	const data = [...Array(16).keys()]
-	const mappedData = data.map((item, index) => {
+	const { getAllPlaylistData, playlistData } = useDatabase()
+
+	const [currentSongIndex, setCurrentSongIndex] = useState(0)
+
+	const [algorithmicPlaylist, setAlgorithmicPlaylist] = useState([])
+
+	useMemo(() => {
+		generateAlgorithmicPlaylist(playlistData, setAlgorithmicPlaylist)
+	}, [JSON.stringify(playlistData)])
+
+	useEffect(() => {
+		setInterval(() => {
+			getAllPlaylistData()
+		}, 60000); // update once per minute
+	}, [])
+
+	const mappedData = algorithmicPlaylist.map((item, index) => {
+		console.log(item)
 		return (
-			<tr key={index} className={`${index === 2 ? "table-primary" : ""}`}>
-				<th scope="row">{item + 1}</th>
+			<tr key={index} className={`${index === currentSongIndex ? "table-primary" : ""}`}>
+				<th scope="row">{item.id + 1}</th>
 				{/* <td>
 					<div className="spinner-grow" role="status">
 						<span className="visually-hidden">Loading...</span>
 					</div>
 				</td> */}
-				<td>og order</td>
+				<td>{item.track.id + 1}</td>
 				<td>listeners</td>
 				<td>likes</td>
-				<td>plays</td>
+				<td>{item.num_plays + 1}</td>
 			</tr>
 		)
 	})
@@ -31,7 +49,11 @@ export default function ResultsPage() {
 			</Row>
 			<Row>
 				<Col>
-					<AudioPlaylist />
+					<AudioPlaylist
+						algorithmicPlaylist={algorithmicPlaylist}
+						currentSongIndex={currentSongIndex}
+						setCurrentSongIndex={setCurrentSongIndex}
+					/>
 				</Col>
 			</Row>
 			<hr />

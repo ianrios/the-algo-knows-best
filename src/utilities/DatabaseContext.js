@@ -10,6 +10,12 @@ export const DatabaseHelper = () => {
 
   const [token, setToken] = useState('')
   const [userData, setUserData] = useState({})
+  const [playlistData, setPlaylistData] = useState({})
+
+  function savePlaylistData(data) {
+    console.log(data)
+    setPlaylistData(prevPlaylistData => data)
+  }
 
   function saveUserData(res) {
     setUserData(res.data);
@@ -66,10 +72,17 @@ export const DatabaseHelper = () => {
 
   function savePlaylist(playlistData) {
     axiosHelper({
-      data: playlistData,
+      data: { playlistData },
       method: 'post',
       url: '/api/playlist/save',
-      successMethod: saveToken,
+    })
+  }
+
+  function getAllPlaylistData() {
+    console.log("getting all playlist data")
+    axiosHelper({
+      url: '/api/playlist/get',
+      successMethod: savePlaylistData,
     })
   }
 
@@ -106,7 +119,10 @@ export const DatabaseHelper = () => {
     }
   }, [token])
 
-  return { token, userData, register, login, logout, savePlaylist }
+  return {
+    token, userData, register, login, logout,
+    playlistData, savePlaylist, getAllPlaylistData
+  }
 }
 
 // custom Provider component

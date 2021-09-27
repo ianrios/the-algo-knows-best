@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Row, Col } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import AudioPlaylist from '../components/AudioPlaylist'
 
 export default function ExperimentPage() {
-
+  const [currentSongIndex, setCurrentSongIndex] = useState(0)
   return (
     <>
       <Row>
@@ -19,7 +19,11 @@ export default function ExperimentPage() {
       </Row>
       <Row>
         <Col sm="12" md={{ span: 6, offset: 3 }} lg={{ span: 4, offset: 4 }}>
-          <AudioPlaylist generating />
+          <AudioPlaylist
+            currentSongIndex={currentSongIndex}
+            setCurrentSongIndex={setCurrentSongIndex}
+            generating
+          />
         </Col>
       </Row>
       <Row>

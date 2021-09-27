@@ -15,12 +15,12 @@ export function axiosHelper(props) {
 		method,
 		url: API_URL + url,
 		headers: {
-			'Content-Type': 'application/json;charset=UTF-8',
+			'Accept': 'application/json',
+			'Content-Type': 'application/json',
 			'Access-Control-Allow-Origin': '*',
 			// 'Access-Control-Allow-Headers': 'Content-Type',
 			// 'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
 			// 'Access-Control-Allow-Credentials': true,
-			'Accept': 'application/json',
 			'Authorization': 'Bearer ' + token
 		},
 		data

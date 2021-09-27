@@ -5,6 +5,8 @@ import { useHistory } from 'react-router';
 import Modal from './Modal';
 import { useDatabase } from '../utilities/DatabaseContext';
 
+import { generateOrderedPlaylist } from '../utilities/algorithmicPlaylistGenerator'
+
 export default function AudioPlaylist(props) {
 
   const { savePlaylist } = useDatabase()
@@ -29,29 +31,10 @@ export default function AudioPlaylist(props) {
     return arr;
   }
 
-  const generatePlaylist = () => [...Array(16).keys()].map((item, index) => {
-    const name = item + 1
-    return (
-      {
-        id: index, //created on backend, generated for front end using index
-        // order: to be created based on final resulting index in array
-        // playlist_id: to be created on backend,
-        placement_liked: 0, // 0 neutral, 1 positive, -1 negative
-        num_plays: 0.0, // percent listened based on skips, pauses, loops, or restarts
-        track: {
-          id: index,
-          file_name: `./audio/T00${name > 9 ? name : "0" + name}.wav`
-        }
-      }
-    )
-  })
-
-  const playlist = generatePlaylist()
+  const playlist = generateOrderedPlaylist()
 
   const [shuffledPlaylist, setShuffledPlaylist] = useState(shufflePlaylist(playlist))
 
-
-  const [currentSongIndex, setCurrentSongIndex] = useState(0)
   const [muted, setMuted] = useState(false)
   const [looped, setLooped] = useState(false)
   const [likedStatus, setLikedStatus] = useState("neutral")
@@ -63,7 +46,7 @@ export default function AudioPlaylist(props) {
   const closeAndRepeat = () => {
     console.log("automatically restart playlist")
     setShowEndingModal(false);
-    setCurrentSongIndex(prevIndex => 0)
+    props.setCurrentSongIndex(prevIndex => 0)
 
   }
   const viewResults = () => {
@@ -85,7 +68,7 @@ export default function AudioPlaylist(props) {
       savePlaylist(prevPlaylist)
       return [...shufflePlaylist(prevPlaylist)]
     })
-    setCurrentSongIndex(prevIndex => 0)
+    props.setCurrentSongIndex(prevIndex => 0)
   }
   const confirmShuffleModal = () => {
     console.log("confirm shuffle")
@@ -97,7 +80,7 @@ export default function AudioPlaylist(props) {
   const handleEnded = () => {
     console.log("ended")
     if (!looped) {
-      setCurrentSongIndex(prevIndex => {
+      props.setCurrentSongIndex(prevIndex => {
         if (prevIndex + 1 >= playlist.length) {
           if (!!props.generating) {
             handleShowEndingModal()
@@ -110,7 +93,7 @@ export default function AudioPlaylist(props) {
   }
   const handleSkip = () => {
     console.log("skip")
-    setCurrentSongIndex(prevIndex => {
+    props.setCurrentSongIndex(prevIndex => {
       if (prevIndex + 1 >= playlist.length) {
         if (!!props.generating) {
           handleShowEndingModal()
@@ -122,7 +105,7 @@ export default function AudioPlaylist(props) {
   }
   const handleBack = () => {
     console.log("back")
-    setCurrentSongIndex(prevIndex => {
+    props.setCurrentSongIndex(prevIndex => {
       if (prevIndex - 1 < 0) {
         return 0
       }
@@ -170,7 +153,7 @@ export default function AudioPlaylist(props) {
 
   useEffect(() => {
     setLikedStatus(prevStatus => "neutral")
-  }, [currentSongIndex])
+  }, [props.currentSongIndex])
 
   useEffect(() => {
     // Component Will Unmount  
@@ -180,17 +163,31 @@ export default function AudioPlaylist(props) {
     };
   }, []);
 
+  // console.log({ gen: !!props.generating, pAP: props.algorithmicPlaylist, pCSI: props.currentSongIndex })
 
-  const currentSong = shuffledPlaylist[currentSongIndex]
+  let currentSong = {}
+  if (!!props.generating) {
+    currentSong = shuffledPlaylist[props.currentSongIndex]
+  }
+  else {
+    currentSong = props.algorithmicPlaylist[props.currentSongIndex]
+  }
+
+  // const currentSong = shuffledPlaylist[props.currentSongIndex]
+
+  // const currentSong = (!!props.generating && props.currentSongIndex)
+  //   ? shuffledPlaylist[props.currentSongIndex]
+  //   : !!props.algorithmicPlaylist && props.algorithmicPlaylist[props.currentSongIndex]
+
   console.log(currentSong)
 
   // const currentPlaylist = shuffledPlaylist.map((item, index) => {
-  //   console.log({ index, currentSongIndex })
+  //   console.log({ index, props.currentSongIndex })
   //   return (
   //     <li
   //       key={index}
   //       className={"list-group-item d-flex justify-content-between align-items-center " +
-  //         index === currentSongIndex && "bg-primary"
+  //         index === props.currentSongIndex && "bg-primary"
   //       }
   //     >
   //       Song {item.id} <span className="badge bg-secondary rounded-pill float-right">14</span>
@@ -200,7 +197,7 @@ export default function AudioPlaylist(props) {
 
   return (
     <>
-      {!!!props.generating ?
+      {(!!!props.generating && props.algorithmicPlaylist.length > 0) ?
         <>
           <h5>Currently Playing: Song {currentSong.track.id + 1}</h5>
           <ReactAudioPlayer
@@ -235,11 +232,11 @@ export default function AudioPlaylist(props) {
             <p className="card-text">Original track order used for song title</p>
             <p className="card-text d-flex flex-column">
               <small className="text-muted">
-                Track {currentSongIndex + 1} of {playlist.length} in shuffled playlist
+                Track {props.currentSongIndex + 1} of {playlist.length} in shuffled playlist
               </small>
               <small className="text-muted">
                 <span className="badge bg-secondary rounded-pill float-right">
-                  {playlist.length - currentSongIndex - 1}</span> songs left
+                  {playlist.length - props.currentSongIndex - 1}</span> songs left
               </small>
               {/* TODO: move like/dislike song here */}
               {/* TODO: add ability to like/dislike placement here */}
