@@ -12,17 +12,20 @@ export default function ResultsPage() {
 
 	const [algorithmicPlaylist, setAlgorithmicPlaylist] = useState([])
 
+	// TODO: if playlist updates, dont reset the current song until after it finishes if the current song changes too
 	useMemo(() => {
 		generateAlgorithmicPlaylist(playlistData, setAlgorithmicPlaylist)
 	}, [JSON.stringify(playlistData)])
-
+	
 	useEffect(() => {
 		setInterval(() => {
 			getAllPlaylistData()
+			// TODO: update playlist after each song finishes playing, instead of every minute
 		}, 60000); // update once per minute
 	}, [])
 
 	// TODO: map the rest of these table items
+	// TODO: use css to show table rows swapping with a smooth transition
 	const mappedData = algorithmicPlaylist.map((item, index) => {
 		console.log(item)
 		return (

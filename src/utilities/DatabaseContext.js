@@ -21,65 +21,74 @@ export const DatabaseHelper = () => {
     setUserData(res.data);
   }
 
-  function destroyToken() {
+  function destroyStorage() {
     setToken('')
+    setUserData(prev => ({}))
     window.localStorage.removeItem('token')
+    window.localStorage.removeItem('user_data')
+
+    register()
     // history.replace('/')
   }
 
   function saveToken(res) {
-    let APItoken; // Initalize variable
+    console.log("url", res.config.url)
+
+    let data; // Initalize variable
     if (res.config.url === API_URL + "/api/auth/register") {
-      APItoken = res.data.data.token
-    } else if (res.config.url === API_URL + "/oauth/token") {
-      APItoken = res.data.access_token
+      data = res.data.data
+    } else if (res.config.url === API_URL + "/api/auth/login") {
+      data = res.data.data
     }
 
-    setToken(APItoken);
-    window.localStorage.setItem('token', APItoken)
+    console.log("token:", data.token)
+    setToken(data.token);
+    setUserData(data.user_data);
+    window.localStorage.setItem('token', data.token)
+    window.localStorage.setItem('user_data', JSON.stringify(data.user_data))
   }
 
-  function register(registrationData) {
+  function register() {
     axiosHelper({
-      data: registrationData,
-      method: 'post',
       url: '/api/auth/register',
       successMethod: saveToken,
     })
   }
 
-  function login(loginData) {
+  function login() {
     axiosHelper({
       data: {
         grant_type: "password",
         client_id: "2",
         client_secret,
-        ...loginData
+        userData
       },
       method: 'post',
-      url: '/oauth/token',
+      url: '/api/auth/login',
       successMethod: saveToken,
+      failureMethod: destroyStorage
     })
   }
 
   function logout() {
     axiosHelper({
       url: '/api/auth/logout',
-      successMethod: destroyToken,
+      successMethod: destroyStorage,
       token
     })
   }
 
-  function savePlaylist(playlistData) {
+  function savePlaylist(data) {
+    console.log({ data })
     axiosHelper({
-      data: { playlistData },
+      data,
       method: 'post',
+      token,
       url: '/api/playlist/save',
     })
   }
 
   function getAllPlaylistData() {
-    console.log("getting all playlist data")
     axiosHelper({
       url: '/api/playlist/get',
       successMethod: savePlaylistData,
@@ -91,31 +100,39 @@ export const DatabaseHelper = () => {
       method: 'get',
       url: '/api/auth/user',
       successMethod: saveUserData,
-      token: token
+      failureMethod: destroyStorage,
+      token
     })
   }
 
   // retaining user login information
   useEffect(() => {
     let lsToken = window.localStorage.getItem('token');
-    // console.log(lsToken)
-    if (lsToken) {
-      axiosHelper({
-        url: '/api/auth/user',
-        successMethod: saveUserData,
-        failureMethod: destroyToken,
-        token: lsToken
-      })
+    let lsUserData = JSON.parse(window.localStorage.getItem('user_data'));
+    if (lsToken && !!!lsUserData) {
+      // if we have the token but not the user
+      getUser(lsToken)
       setToken(lsToken)
     }
+    else if (!!!lsToken && lsUserData) {
+      // if we have the user data but not the token
+      login(lsUserData)
+      setUserData(lsUserData)
+    }
+    else if (lsToken && lsUserData) {
+      // if we have both the token and the user data
+      setToken(lsToken)
+      setUserData(lsUserData)
+    }
     else {
-      register({})
+      // we dont have either, which means we need to register a new user
+      register()
     }
   }, [])
 
   useEffect(() => {
     if (token.length > 0) {
-      getUser()
+      getUser(token)
     }
   }, [token])
 
