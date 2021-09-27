@@ -18,7 +18,6 @@ export default function BootstrapModal(props) {
                     <div className='col-4'>{props.likeModule}</div>
                 </Row>
             </Modal.Body>
-            {/* TODO: add ability to rate your listening experience as a whole */}
             <Modal.Footer>
                 {(props.infoBtnText && props.infoButtonClickHandler) && <Button variant="info" onClick={props.infoButtonClickHandler}>
                     {props.infoBtnText}

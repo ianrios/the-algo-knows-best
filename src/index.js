@@ -6,7 +6,8 @@ import { BrowserRouter as Router } from 'react-router-dom'
 // import history from './utilities/history'
 import App from './App';
 import ScrollToTop from './components/ScrollToTop'
-import { DatabaseProvider } from './utilities/DatabaseContext'
+import { AuthProvider } from './utilities/AuthContext'
+import { PlaylistProvider } from './utilities/PlaylistContext'
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';
@@ -15,14 +16,16 @@ import './index.css';
 
 ReactDOM.render(
   <React.StrictMode>
-    <DatabaseProvider>
-      <Router
-      // history={history}
-      >
-        <ScrollToTop />
-        <App />
-      </Router>
-    </DatabaseProvider>
+    <AuthProvider>
+      <PlaylistProvider>
+        <Router
+        // history={history}
+        >
+          <ScrollToTop />
+          <App />
+        </Router>
+      </PlaylistProvider>
+    </AuthProvider>
   </React.StrictMode>
   , document.getElementById('root')
 );

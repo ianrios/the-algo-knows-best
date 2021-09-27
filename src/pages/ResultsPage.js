@@ -2,44 +2,35 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import AudioPlaylist from '../components/AudioPlaylist'
-import { useDatabase } from '../utilities/DatabaseContext'
+import { usePlaylist } from '../utilities/PlaylistContext'
 import { generateAlgorithmicPlaylist } from '../utilities/algorithmicPlaylistGenerator'
 
 export default function ResultsPage() {
-	const { getAllPlaylistData, playlistData } = useDatabase()
+	const { getAllPlaylistData, allPlaylistData } = usePlaylist()
 
 	const [currentSongIndex, setCurrentSongIndex] = useState(0)
 
 	const [algorithmicPlaylist, setAlgorithmicPlaylist] = useState([])
 
-	// TODO: if playlist updates, dont reset the current song until after it finishes if the current song changes too
 	useMemo(() => {
-		generateAlgorithmicPlaylist(playlistData, setAlgorithmicPlaylist)
-	}, [JSON.stringify(playlistData)])
-	
-	useEffect(() => {
-		setInterval(() => {
-			getAllPlaylistData()
-			// TODO: update playlist after each song finishes playing, instead of every minute
-		}, 60000); // update once per minute
-	}, [])
+		generateAlgorithmicPlaylist(allPlaylistData, setAlgorithmicPlaylist)
+	}, [JSON.stringify(allPlaylistData)])
 
 	// TODO: map the rest of these table items
 	// TODO: use css to show table rows swapping with a smooth transition
 	const mappedData = algorithmicPlaylist.map((item, index) => {
-		console.log(item)
 		return (
 			<tr key={index} className={`${index === currentSongIndex ? "table-primary" : ""}`}>
-				<th scope="row">{item.id + 1}</th>
+				<th scope="row">{item.id}</th>
 				{/* <td>
 					<div className="spinner-grow" role="status">
 						<span className="visually-hidden">Loading...</span>
 					</div>
 				</td> */}
-				<td>{item.track.id + 1}</td>
+				<td>{item.track.id}</td>
 				<td>listeners</td>
 				<td>likes</td>
-				<td>{item.num_plays + 1}</td>
+				<td>{item.num_plays}</td>
 			</tr>
 		)
 	})

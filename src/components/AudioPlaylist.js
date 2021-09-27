@@ -3,13 +3,15 @@ import ReactAudioPlayer from 'react-audio-player';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useHistory } from 'react-router';
 import Modal from './Modal';
-import { useDatabase } from '../utilities/DatabaseContext';
+import { usePlaylist } from '../utilities/PlaylistContext';
+import { useAuth } from '../utilities/AuthContext';
 
 import { generateOrderedPlaylist } from '../utilities/algorithmicPlaylistGenerator'
 
 export default function AudioPlaylist(props) {
 
-  const { savePlaylist } = useDatabase()
+  const { saveNewPlaylist, getAllPlaylistData } = usePlaylist()
+  const { token } = useAuth()
 
   const history = useHistory()
 
@@ -28,7 +30,12 @@ export default function AudioPlaylist(props) {
       [arr[currIdx], arr[randIdx]] = [arr[randIdx], arr[currIdx]];
     }
 
-    return arr;
+    return arr.map(prevItem => {
+      let item = { ...prevItem }
+      item.num_plays = 0
+      item.placement_liked = 0
+      return item
+    })
   }
 
   const playlist = generateOrderedPlaylist()
@@ -44,13 +51,11 @@ export default function AudioPlaylist(props) {
   const [showEndingModal, setShowEndingModal] = useState(false);
   const handleShowEndingModal = () => setShowEndingModal(true);
   const closeAndRepeat = () => {
-    console.log("automatically restart playlist")
     setShowEndingModal(false);
     props.setCurrentSongIndex(prevIndex => 0)
 
   }
   const viewResults = () => {
-    console.log("view results")
     setShowEndingModal(false);
     history.push('/results')
   }
@@ -59,33 +64,30 @@ export default function AudioPlaylist(props) {
   const [showShuffleModal, setShowShuffleModal] = useState(false);
   const handleShowShuffleModal = () => setShowShuffleModal(true);
   const closeShuffleModal = () => {
-    console.log("close shuffle modal")
     setShowShuffleModal(false);
   }
   const handleShuffle = () => {
-    console.log("shuffling")
     setShuffledPlaylist(prevPlaylist => {
       const data = {
         preference: likedStatus,
         playlistData: prevPlaylist
       }
-      savePlaylist(data)
+      saveNewPlaylist(data, token)
 
       return [...shufflePlaylist(prevPlaylist)]
     })
     props.setCurrentSongIndex(prevIndex => 0)
   }
   const confirmShuffleModal = () => {
-    console.log("confirm shuffle")
     setShowEndingModal(false);
     setShowShuffleModal(false);
     handleShuffle()
   }
 
   const handleEnded = () => {
-    console.log("ended")
     if (!looped) {
       props.setCurrentSongIndex(prevIndex => {
+        getAllPlaylistData()
         if (prevIndex + 1 >= playlist.length) {
           if (!!props.generating) {
             handleShowEndingModal()
@@ -97,7 +99,6 @@ export default function AudioPlaylist(props) {
     }
   }
   const handleSkip = () => {
-    console.log("skip")
     props.setCurrentSongIndex(prevIndex => {
       if (prevIndex + 1 >= playlist.length) {
         if (!!props.generating) {
@@ -109,7 +110,6 @@ export default function AudioPlaylist(props) {
     })
   }
   const handleBack = () => {
-    console.log("back")
     props.setCurrentSongIndex(prevIndex => {
       if (prevIndex - 1 < 0) {
         return 0
@@ -118,17 +118,23 @@ export default function AudioPlaylist(props) {
     })
   }
   const handleLoop = () => {
-    console.log("loop")
     setLooped(prev => !prev)
   }
   const handleMuted = () => {
-    console.log("muted")
     setMuted(prev => !prev)
   }
 
-
   const handleListen = () => {
-    console.log("listen")
+    setShuffledPlaylist(prevPlaylist => {
+      // 30 seconds counts as a listen
+      return prevPlaylist.map(prevPlaylistTrack => {
+        let playlistTrack = { ...prevPlaylistTrack };
+        if (playlistTrack.track.file_name === currentSong.track.file_name) {
+          playlistTrack.num_plays++;
+        }
+        return playlistTrack;
+      })
+    })
   }
   const handleAbort = () => {
     console.log("abort")
@@ -148,11 +154,9 @@ export default function AudioPlaylist(props) {
   }
 
   const handleLike = () => {
-    console.log("liked playlist")
     setLikedStatus(prevStatus => prevStatus === "positive" ? "neutral" : "positive")
   }
   const handleDislike = () => {
-    console.log("disliked playlist")
     setLikedStatus(prevStatus => prevStatus === "negative" ? "neutral" : "negative")
   }
 
@@ -167,15 +171,13 @@ export default function AudioPlaylist(props) {
         preference: likedStatus,
         playlistData: shuffledPlaylist
       }
-      savePlaylist(data)
+      saveNewPlaylist(data, token)
     };
   }, []);
 
   useEffect(() => {
     setLikedStatus(prev => 'neutral')
   }, [JSON.stringify(shuffledPlaylist)])
-
-  // console.log({ gen: !!props.generating, pAP: props.algorithmicPlaylist, pCSI: props.currentSongIndex })
 
   let currentSong = {}
   if (!!props.generating) {
@@ -191,10 +193,8 @@ export default function AudioPlaylist(props) {
   //   ? shuffledPlaylist[props.currentSongIndex]
   //   : !!props.algorithmicPlaylist && props.algorithmicPlaylist[props.currentSongIndex]
 
-  console.log(currentSong)
 
   // const currentPlaylist = shuffledPlaylist.map((item, index) => {
-  //   console.log({ index, props.currentSongIndex })
   //   return (
   //     <li
   //       key={index}
