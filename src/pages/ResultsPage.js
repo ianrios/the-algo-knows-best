@@ -32,6 +32,7 @@ export default function ResultsPage() {
 			</tr>
 		)
 	})
+	// TODO: show "you are viewing data collected from x date to y date"
 	return (
 		<>
 			<Row>
@@ -60,9 +61,19 @@ export default function ResultsPage() {
 							<thead>
 								<tr>
 									<th scope="col">
-										<span className="d-none d-md-block">ML</span>
-										{" "}Ranking{" "}
-										<span className="d-none d-lg-block">(Popularity)</span>
+										<OverlayTrigger
+											placement="top"
+											overlay={
+												<Tooltip id={`tooltip-top`}>
+													Generated on the backend; Looks at all track information present on this table, as well as playlist specific information such as percent listened, playlist preference ranking, retention time, and more. Visit <Link to="/info">Info</Link> to learn more
+												</Tooltip>
+											}
+										>
+											<span>
+												<span className="d-none d-md-block">ML{" "}</span>Ranking
+												<span className="d-none d-lg-block"><Link to='/info'>Learn More</Link></span>
+											</span>
+										</OverlayTrigger>
 									</th>
 									{/* <th scope="col">Playing Now</th> */}
 									<th scope="col">
@@ -82,13 +93,24 @@ export default function ResultsPage() {
 											<span>Listeners</span>
 										</OverlayTrigger>
 									</th>
-									<th scope="col">Likes</th>
 									<th scope="col">
 										<OverlayTrigger
 											placement="top"
 											overlay={
 												<Tooltip id={`tooltip-top`}>
-													A "play" is counted when a song is listened to for over 30 seconds.
+													Aggregate Like to Dislike Ratio (a like is +1, a dislike is -1, no preference is 0)
+												</Tooltip>
+											}
+										>
+											<span>Likes<span className="d-none d-lg-block w-25">{" "}(Popularity)</span></span>
+										</OverlayTrigger>
+									</th>
+									<th scope="col">
+										<OverlayTrigger
+											placement="top"
+											overlay={
+												<Tooltip id={`tooltip-top`}>
+													A "play" is counted in 1/10ths during streaming (this accounts for people who only listen halfway, or skip after listening to a few seconds)
 												</Tooltip>
 											}
 										>

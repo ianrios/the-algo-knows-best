@@ -10,16 +10,21 @@ export const PlaylistHelper = () => {
     const [allPlaylistData, setAllPlaylistData] = useState([])
 
     function saveAllPlaylistData(data) {
+        // TODO: create a "next state" that only updates the main playlist when at the end of a song play OR if the current song index is the same in both arrays
         setAllPlaylistData(prevAllPlaylistData => data.data)
     }
 
-    function saveNewPlaylist(data, token, failureMethod) {
+    function saveNewPlaylist(data, token, newPlaylist, failureMethod) {
+        const successMethod = () => {
+            newPlaylist()
+            getAllPlaylistData()
+        }
         axiosHelper({
             data,
             method: 'post',
             token,
             url: '/api/playlist/save',
-            successMethod: getAllPlaylistData,
+            successMethod,
             failureMethod,
         })
     }

@@ -1,21 +1,23 @@
-export const generateOrderedPlaylist = () => [
-    39778,
-    42872,
-    39111,
-    33153,
-    34305,
-    40556,
-    39559,
-    42451,
-    37662,
-    45667,
-    44555,
-    48004,
-    45163,
-    45695,
-    43243,
-    50109
-].map((songLength, index) => {
+// let songLengths = [
+// 39778,
+// 42872,
+// 39111,
+// 33153,
+// 34305,
+// 40556,
+// 39559,
+// 42451,
+// 37662,
+// 45667,
+// 44555,
+// 48004,
+// 45163,
+// 45695,
+// 43243,
+// 50109
+// ]
+
+export const generateOrderedPlaylist = () => [...Array(16).keys()].map(index => {
     const id = index + 1
     return (
         {
@@ -27,7 +29,7 @@ export const generateOrderedPlaylist = () => [
             num_plays: 0.0, // percent listened based on skips, pauses, loops, or restarts
             track: {
                 id: id,
-                song_length: songLength,
+                // song_length: songLength,
                 file_name: `./audio/T00${id > 9 ? id : "0" + id}.wav`
             }
         }
@@ -35,6 +37,7 @@ export const generateOrderedPlaylist = () => [
 })
 
 export const generateAlgorithmicPlaylist = (allPlaylistData, setResult) => {
+    // TODO: move algorithmic generation to backend - use indexing
     // TODO: look at playlist data and rank items based on popularity, retention time, order, listeners, and more
     let output = []
 

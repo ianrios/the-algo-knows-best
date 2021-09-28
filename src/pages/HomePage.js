@@ -47,11 +47,11 @@ export default function HomePage() {
 
         <hr className="mt-4" />
         <Row className="my-5">
-          <div class="col-md-7">
-            <h2>Participate on your device. <span class="text-muted">Best with headphones.</span></h2>
-            <p class="lead">As you generate new playlist data, you'll be able to see the resulting algorithmic playlist update in real time.</p>
+          <div className="col-md-7">
+            <h2>Participate on your device. <span className="text-muted">Best with headphones.</span></h2>
+            <p className="lead">As you generate new playlist data, you'll be able to see the resulting algorithmic playlist update in real time.</p>
           </div>
-          <div class="col-md-5 text-center mt-3">
+          <div className="col-md-5 text-center mt-3">
             <QRCode value="https://the-algorithm-knows-best.web.app/" />
           </div>
         </Row>
