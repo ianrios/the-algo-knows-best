@@ -13,13 +13,14 @@ export const PlaylistHelper = () => {
         setAllPlaylistData(prevAllPlaylistData => data.data)
     }
 
-    function saveNewPlaylist(data, token) {
+    function saveNewPlaylist(data, token, failureMethod) {
         axiosHelper({
             data,
             method: 'post',
             token,
             url: '/api/playlist/save',
             successMethod: getAllPlaylistData,
+            failureMethod,
         })
     }
 

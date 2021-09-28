@@ -3,15 +3,15 @@ import ReactAudioPlayer from 'react-audio-player';
 import { OverlayTrigger, Tooltip, Spinner, Row, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router';
 import Modal from './Modal';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 import { usePlaylist } from '../utilities/PlaylistContext';
 import { useAuth } from '../utilities/AuthContext';
-
 import { generateOrderedPlaylist } from '../utilities/algorithmicPlaylistGenerator'
 
 export default function AudioPlaylist(props) {
 
   const { saveNewPlaylist, getAllPlaylistData } = usePlaylist()
-  const { token } = useAuth()
+  const { token, destroyStorage } = useAuth()
 
   const history = useHistory()
 
@@ -43,6 +43,7 @@ export default function AudioPlaylist(props) {
   const [shuffledPlaylist, setShuffledPlaylist] = useState(shufflePlaylist(playlist))
 
   // const [muted, setMuted] = useState(false)
+  const [listenInterval, setListenInterval] = useState(30000)
   const [looped, setLooped] = useState(false)
   const [likedStatus, setLikedStatus] = useState("neutral")
 
@@ -72,7 +73,7 @@ export default function AudioPlaylist(props) {
         preference: likedStatus,
         playlistData: prevPlaylist
       }
-      saveNewPlaylist(data, token)
+      saveNewPlaylist(data, token, destroyStorage)
 
       return [...shufflePlaylist(prevPlaylist)]
     })
@@ -125,12 +126,14 @@ export default function AudioPlaylist(props) {
   // }
 
   const handleListen = () => {
+    // percent listened based on song time length (broken up into 10ths)
+    console.log("listening at 1/10th of the song length:", listenInterval)
     setShuffledPlaylist(prevPlaylist => {
-      // 30 seconds counts as a listen
+
       return prevPlaylist.map(prevPlaylistTrack => {
         let playlistTrack = { ...prevPlaylistTrack };
         if (playlistTrack.track.file_name === currentSong.track.file_name) {
-          playlistTrack.num_plays++;
+          playlistTrack.num_plays += .1;
         }
         return playlistTrack;
       })
@@ -172,7 +175,7 @@ export default function AudioPlaylist(props) {
           preference: likedStatus,
           playlistData: shuffledPlaylist
         }
-        saveNewPlaylist(data, token)
+        saveNewPlaylist(data, token, destroyStorage)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -211,6 +214,10 @@ export default function AudioPlaylist(props) {
   //     </li>
   //   )
   // })
+
+  useDeepCompareEffect(() => {
+    setListenInterval(prevInterval => Math.floor(currentSong.track.song_length / 10))
+  }, [currentSong])
 
   const LikeModule = (
     <div className="btn-group" role="group" aria-label="popularity controls">
@@ -253,7 +260,7 @@ export default function AudioPlaylist(props) {
             onVolumeChanged={handleVolumeChanged}
             loop={false}
             src={currentSong.track.file_name}
-            listenInterval={30000}
+            listenInterval={listenInterval}
             className="w-100 rounded"
             autoPlay
             controls
@@ -294,7 +301,7 @@ export default function AudioPlaylist(props) {
               onVolumeChanged={handleVolumeChanged}
               loop={looped}
               src={currentSong.track.file_name}
-              listenInterval={30000}
+              listenInterval={listenInterval}
               className="w-100 rounded"
               autoPlay
               controls

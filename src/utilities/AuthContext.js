@@ -109,7 +109,7 @@ export const AuthHelper = () => {
 
 
   return {
-    token, userData, logout
+    token, userData, logout, destroyStorage
   }
 }
 

@@ -26,6 +26,7 @@ export default function ResultsPage() {
 				<th scope="row">{item.id}</th>
 				<td>{item.track.id}</td>
 				<td>{item.listeners}</td>
+				{/* TODO: implement likes */}
 				<td>likes</td>
 				<td>{item.num_plays}</td>
 			</tr>
