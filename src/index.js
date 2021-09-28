@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router } from 'react-router-dom'
 
-// import history from './utilities/history'
 import App from './App';
 import ScrollToTop from './components/ScrollToTop'
 import { AuthProvider } from './utilities/AuthContext'
@@ -19,7 +18,6 @@ ReactDOM.render(
     <AuthProvider>
       <PlaylistProvider>
         <Router
-        // history={history}
         >
           <ScrollToTop />
           <App />

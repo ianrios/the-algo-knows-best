@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { axiosHelper } from './axiosHelper'
-// import history from './history'
 import { client_secret } from './constants.js'
 
 const AuthContext = createContext({});

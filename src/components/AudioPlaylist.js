@@ -6,12 +6,11 @@ import Modal from './Modal';
 import { usePlaylist } from '../utilities/PlaylistContext';
 import { useAuth } from '../utilities/AuthContext';
 import { generateOrderedPlaylist } from '../utilities/algorithmicPlaylistGenerator'
-import useDeepCompareEffect from 'use-deep-compare-effect';
 import Icon from './Icon'
 
 export default function AudioPlaylist(props) {
 
-  const { saveNewPlaylist, getAllPlaylistData } = usePlaylist()
+  const { saveNewPlaylist, getFinalPlaylistResult } = usePlaylist()
   const { token, destroyStorage } = useAuth()
 
   const history = useHistory()
@@ -86,7 +85,7 @@ export default function AudioPlaylist(props) {
   const handleEnded = () => {
     if (!looped) {
       props.setCurrentSongIndex(prevIndex => {
-        getAllPlaylistData()
+        getFinalPlaylistResult()
         if (prevIndex + 1 >= playlist.length) {
           if (!!props.generating) {
             handleShowEndingModal()
@@ -129,13 +128,34 @@ export default function AudioPlaylist(props) {
   }
 
 
-  // listen interval code
   const [listenInterval, setListenInterval] = useState(30000)
+
+  let currentSong;
+  if (!!props.generating) {
+    currentSong = shuffledPlaylist[props.currentSongIndex]
+  }
+  else {
+    currentSong = props.algorithmicPlaylist[props.currentSongIndex]
+  }
+
+  useEffect(() => {
+    if (currentSong) {
+      setListenInterval(prevInterval => {
+        let newInterval = Math.floor(currentSong.track.song_length / 10)
+        if (prevInterval !== newInterval) {
+          // console.log("setting interval")
+          return newInterval
+        }
+        return prevInterval
+      })
+    }
+  }, [props.currentSongIndex, currentSong])
+
+  // listen interval code
   const handleListen = () => {
     // percent listened based on song time length (broken up into 10ths)
-    console.log("listening at 1/10th of the song length:", listenInterval)
+    // console.log("listening at 1/10th of the song length:", listenInterval)
     setShuffledPlaylist(prevPlaylist => {
-
       return prevPlaylist.map(prevPlaylistTrack => {
         let playlistTrack = { ...prevPlaylistTrack };
         if (playlistTrack.track.file_name === currentSong.track.file_name) {
@@ -146,18 +166,24 @@ export default function AudioPlaylist(props) {
     })
   }
 
-  useDeepCompareEffect(() => {
-    if (currentSong) {
-      setListenInterval(prevInterval => {
-        console.log('setting interval at beginning of song')
-        let audio = document.querySelector('audio')
-        let newInterval = Math.floor(audio.duration * 100)
-        return newInterval
-      })
-    }
-  }, [props.currentSongIndex, currentSong])
+  // useEffect(() => {
+  //   if (currentSong) {
+  //     // if (currentSong.track.file_name) {
+  //     setListenInterval(prevInterval => {
+  //       // TODO: use current song audio duration instead of saving this data in database
+  //       console.log('setting interval:', currentSong.track.song_length)
+  //       // let audio = document.querySelector('audio')
+  //       // let newInterval = Math.floor(audio.duration * 100)
+  //       // return newInterval
+  //       return Math.floor(currentSong.track.song_length / 10)
+  //     })
+  //     // }
+  //   }
+  // }, [
+  //   props.currentSongIndex, currentSong
+  // ])
 
-  
+
   const handleAbort = () => {
     // console.log("abort")
   }
@@ -210,14 +236,6 @@ export default function AudioPlaylist(props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  let currentSong;
-  if (!!props.generating) {
-    currentSong = shuffledPlaylist[props.currentSongIndex]
-  }
-  else {
-    currentSong = props.algorithmicPlaylist[props.currentSongIndex]
-  }
 
   return (
     currentSong ? <>

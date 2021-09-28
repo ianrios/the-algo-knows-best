@@ -6,18 +6,34 @@ const PlaylistContext = createContext({});
 // helper function that exports just the needed / wanted data for the provider
 export const PlaylistHelper = () => {
 
-    // playlist specific
-    const [allPlaylistData, setAllPlaylistData] = useState([])
-
-    function saveAllPlaylistData(data) {
-        // TODO: create a "next state" that only updates the main playlist when at the end of a song play OR if the current song index is the same in both arrays
-        setAllPlaylistData(prevAllPlaylistData => data.data)
+    // next state
+    const [nextPlaylistData, setNextPlaylistData] = useState([])
+    function nextPlaylistDataState(data) {
+        setNextPlaylistData(prevFinalPlaylistResult => data.data)
     }
 
+
+    // final result
+    const [finalPlaylistResult, setFinalPlaylistResult] = useState([])
+    function getFinalPlaylistResult() {
+        axiosHelper({
+            url: '/api/playlist/result',
+            successMethod: nextPlaylistDataState,
+        })
+    }
+    function updatePlaylistData(currentSongIndex) {
+        // if (
+        // (if current song is the same index in both arrays)
+        // || (if current song has ended)) {
+        setFinalPlaylistResult(prevFinalPlaylistResult => nextPlaylistData)
+        // }
+    }
+
+    // save new playlist to database
     function saveNewPlaylist(data, token, newPlaylist, failureMethod) {
         const successMethod = () => {
             newPlaylist()
-            getAllPlaylistData()
+            getFinalPlaylistResult()
         }
         axiosHelper({
             data,
@@ -29,20 +45,34 @@ export const PlaylistHelper = () => {
         })
     }
 
+    // all playlists from database
+    const [allPlaylistData, setAllPlaylistData] = useState([])
+    function saveAllPlaylistData(data) {
+        setAllPlaylistData(prevAllPlaylistData => data.data)
+    }
     function getAllPlaylistData() {
         axiosHelper({
-            url: '/api/playlist/get',
+            url: '/api/playlist/get/all',
             successMethod: saveAllPlaylistData,
         })
     }
 
+    // on mount, get final result from database
     useEffect(() => {
-        getAllPlaylistData()
+        getFinalPlaylistResult()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return {
-        allPlaylistData, saveNewPlaylist, getAllPlaylistData
+        saveNewPlaylist,
+
+        nextPlaylistData, // temporarily here to view in console.log
+        finalPlaylistResult,
+        // getFinalPlaylistResult,
+        updatePlaylistData,
+
+        allPlaylistData,
+        getAllPlaylistData,
     }
 }
 

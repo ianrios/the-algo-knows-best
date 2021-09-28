@@ -3,24 +3,18 @@ import { Row, Col, OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import AudioPlaylist from '../components/AudioPlaylist'
 import { usePlaylist } from '../utilities/PlaylistContext'
-import { generateAlgorithmicPlaylist } from '../utilities/algorithmicPlaylistGenerator'
-import useDeepCompareEffect from 'use-deep-compare-effect'
 
 export default function ResultsPage() {
-	const { allPlaylistData } = usePlaylist()
+	const { finalPlaylistResult } = usePlaylist()
 
 	const [currentSongIndex, setCurrentSongIndex] = useState(0)
 
-	const [algorithmicPlaylist, setAlgorithmicPlaylist] = useState([])
 
-	useDeepCompareEffect(() => {
-		// TODO: if playlist updates, dont reset the current song until after it finishes if the current song changes too
-		generateAlgorithmicPlaylist(allPlaylistData, setAlgorithmicPlaylist)
-	}, [allPlaylistData])
+	// TODO: if playlist updates, dont reset the current song until after it finishes if the current song changes too
 
 	// TODO: map the rest of these table items
 	// TODO: use css to show table rows swapping with a smooth transition
-	const mappedData = algorithmicPlaylist.map((item, index) => {
+	const mappedData = finalPlaylistResult.map((item, index) => {
 		return (
 			<tr key={index} className={`${index === currentSongIndex ? "table-primary" : ""}`}>
 				<th scope="row">{item.id}</th>
@@ -44,7 +38,7 @@ export default function ResultsPage() {
 			<Row>
 				<Col>
 					<AudioPlaylist
-						algorithmicPlaylist={algorithmicPlaylist}
+						algorithmicPlaylist={finalPlaylistResult}
 						currentSongIndex={currentSongIndex}
 						setCurrentSongIndex={setCurrentSongIndex}
 					/>
@@ -55,7 +49,7 @@ export default function ResultsPage() {
 				<Col>
 					<h2>Statistics</h2>
 					<p>View the data collected from the experiment that is used to generate to the current playlist. <Link className="link-dark" to="/stream">Participate now</Link> to change the data in real time.</p>
-					{algorithmicPlaylist.length ? (
+					{finalPlaylistResult.length ? (
 
 						<table className="table table-striped">
 							<thead>

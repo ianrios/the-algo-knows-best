@@ -1,23 +1,25 @@
-// let songLengths = [
-// 39778,
-// 42872,
-// 39111,
-// 33153,
-// 34305,
-// 40556,
-// 39559,
-// 42451,
-// 37662,
-// 45667,
-// 44555,
-// 48004,
-// 45163,
-// 45695,
-// 43243,
-// 50109
-// ]
+let songLengths = [
+    39778,
+    42872,
+    39111,
+    33153,
+    34305,
+    40556,
+    39559,
+    42451,
+    37662,
+    45667,
+    44555,
+    48004,
+    45163,
+    45695,
+    43243,
+    50109
+]
 
-export const generateOrderedPlaylist = () => [...Array(16).keys()].map(index => {
+// [...Array(16).keys()]
+
+export const generateOrderedPlaylist = () => songLengths.map((songLength, index) => {
     const id = index + 1
     return (
         {
@@ -29,54 +31,55 @@ export const generateOrderedPlaylist = () => [...Array(16).keys()].map(index => 
             num_plays: 0.0, // percent listened based on skips, pauses, loops, or restarts
             track: {
                 id: id,
-                // song_length: songLength,
+                liked: "neutral", // initialize all songs as a neutral like unless otherwise changes
+                song_length: songLength,
                 file_name: `./audio/T00${id > 9 ? id : "0" + id}.wav`
             }
         }
     )
 })
 
-export const generateAlgorithmicPlaylist = (allPlaylistData, setResult) => {
-    // TODO: move algorithmic generation to backend - use indexing
-    // TODO: look at playlist data and rank items based on popularity, retention time, order, listeners, and more
-    let output = []
+// export const generateAlgorithmicPlaylist = (allPlaylistData, setResult) => {
+//     // TODO: move algorithmic generation to backend - use indexing
+//     // TODO: look at playlist data and rank items based on popularity, retention time, order, listeners, and more
+//     let output = []
 
-    output = generateOrderedPlaylist()
-    // console.log("output:", output)
-    // console.log("allPlaylistData:", allPlaylistData)
+//     output = generateOrderedPlaylist()
+//     // console.log("output:", output)
+//     // console.log("allPlaylistData:", allPlaylistData)
 
-    let uniqueUserPlays = {}
+//     // let uniqueUserPlays = {}
 
-    for (const playlist of allPlaylistData) {
-        for (const playlistTrack of playlist.playlist_tracks) {
-            let index = playlistTrack.track_id - 1
-            // console.log("updating for final order:", playlistTrack)
-            output[index].num_plays += playlistTrack.num_plays
+//     // for (const playlist of allPlaylistData) {
+//     //     for (const playlistTrack of playlist.playlist_tracks) {
+//     //         let index = playlistTrack.track_id - 1
+//     //         // console.log("updating for final order:", playlistTrack)
+//     //         output[index].num_plays += playlistTrack.num_plays
 
-            if (playlistTrack.num_plays > 0) {
-                // user_id:track_id
-                let key = `${playlist.user_id}:${playlistTrack.track_id}`
-                if (!uniqueUserPlays[key]) {
-                    uniqueUserPlays[key] = 1
-                }
-            }
+//     //         if (playlistTrack.num_plays > 0) {
+//     //             // user_id:track_id
+//     //             let key = `${playlist.user_id}:${playlistTrack.track_id}`
+//     //             if (!uniqueUserPlays[key]) {
+//     //                 uniqueUserPlays[key] = 1
+//     //             }
+//     //         }
 
-            // playlistTrack.order
-            // playlistTrack.preference
-        }
-    }
-    for (const key in uniqueUserPlays) {
-        // let [user_id, track_id] = key.split(':')
-        output[key.split(':')[1] - 1].listeners++
-    }
+//     //         // playlistTrack.order
+//     //         // playlistTrack.preference
+//     //     }
+//     // }
+//     // for (const key in uniqueUserPlays) {
+//     //     // let [user_id, track_id] = key.split(':')
+//     //     output[key.split(':')[1] - 1].listeners++
+//     // }
 
-    // temporarily use original order for data viewing
-    // setResult(prev => generateOrderedPlaylist())
+//     // temporarily use original order for data viewing
+//     // setResult(prev => generateOrderedPlaylist())
 
-    setResult(prev => {
-        if (allPlaylistData.length) {
-            return output
-        }
-        return prev
-    })
-}
+//     setResult(prev => {
+//         if (allPlaylistData.length) {
+//             return output
+//         }
+//         return prev
+//     })
+// }
