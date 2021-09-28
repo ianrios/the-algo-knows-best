@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Col, Modal, Row } from 'react-bootstrap'
+import { Button, Modal, Row, Col } from 'react-bootstrap'
 
 export default function BootstrapModal(props) {
 
@@ -14,8 +14,8 @@ export default function BootstrapModal(props) {
                 {props.bodyText}
                 <hr />
                 <Row>
-                    <div className='col-8'>Did you enjoy your Listening Experience?</div>
-                    <div className='col-4'>{props.likeModule}</div>
+                    <Col xs={8}>Did you enjoy your Listening Experience?</Col>
+                    <Col xs={4}>{props.likeModule}</Col>
                 </Row>
             </Modal.Body>
             <Modal.Footer>

@@ -10,7 +10,6 @@ export const PlaylistHelper = () => {
     const [allPlaylistData, setAllPlaylistData] = useState([])
 
     function saveAllPlaylistData(data) {
-        console.log("saving playlist:", data.data)
         setAllPlaylistData(prevAllPlaylistData => data.data)
     }
 
@@ -20,6 +19,7 @@ export const PlaylistHelper = () => {
             method: 'post',
             token,
             url: '/api/playlist/save',
+            successMethod: getAllPlaylistData,
         })
     }
 
@@ -32,6 +32,7 @@ export const PlaylistHelper = () => {
 
     useEffect(() => {
         getAllPlaylistData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return {

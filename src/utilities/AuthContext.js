@@ -103,12 +103,13 @@ export const AuthHelper = () => {
       // we dont have either, which means we need to register a new user
       register()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
 
 
   return {
-    token, userData
+    token, userData, logout
   }
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactAudioPlayer from 'react-audio-player';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip, Spinner, Row, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router';
 import Modal from './Modal';
 import { usePlaylist } from '../utilities/PlaylistContext';
@@ -42,7 +42,7 @@ export default function AudioPlaylist(props) {
 
   const [shuffledPlaylist, setShuffledPlaylist] = useState(shufflePlaylist(playlist))
 
-  const [muted, setMuted] = useState(false)
+  // const [muted, setMuted] = useState(false)
   const [looped, setLooped] = useState(false)
   const [likedStatus, setLikedStatus] = useState("neutral")
 
@@ -120,9 +120,9 @@ export default function AudioPlaylist(props) {
   const handleLoop = () => {
     setLooped(prev => !prev)
   }
-  const handleMuted = () => {
-    setMuted(prev => !prev)
-  }
+  // const handleMuted = () => {
+  //   setMuted(prev => !prev)
+  // }
 
   const handleListen = () => {
     setShuffledPlaylist(prevPlaylist => {
@@ -137,20 +137,20 @@ export default function AudioPlaylist(props) {
     })
   }
   const handleAbort = () => {
-    console.log("abort")
+    // console.log("abort")
   }
   const handlePause = () => {
-    console.log("pause")
+    // console.log("pause")
   }
   const handlePlay = () => {
-    console.log("play")
+    // console.log("play")
   }
 
   const handleSeeked = () => {
-    console.log("seeked")
+    // console.log("seeked")
   }
   const handleVolumeChanged = () => {
-    console.log("volume changed")
+    // console.log("volume changed")
   }
 
   const handleLike = () => {
@@ -167,19 +167,24 @@ export default function AudioPlaylist(props) {
   useEffect(() => {
     // Component Will Unmount  
     return function cleanup() {
-      const data = {
-        preference: likedStatus,
-        playlistData: shuffledPlaylist
+      if (!!!props.generating) {
+        const data = {
+          preference: likedStatus,
+          playlistData: shuffledPlaylist
+        }
+        saveNewPlaylist(data, token)
       }
-      saveNewPlaylist(data, token)
-    };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const flatPlaylist = JSON.stringify(shuffledPlaylist)
   useEffect(() => {
     setLikedStatus(prev => 'neutral')
-  }, [JSON.stringify(shuffledPlaylist)])
 
-  let currentSong = {}
+  }, [flatPlaylist])
+
+  let currentSong;
   if (!!props.generating) {
     currentSong = shuffledPlaylist[props.currentSongIndex]
   }
@@ -234,10 +239,10 @@ export default function AudioPlaylist(props) {
   )
 
   return (
-    <>
+    currentSong ? <>
       {(!!!props.generating && props.algorithmicPlaylist.length > 0) ?
         <>
-          <h5>Currently Playing: Song {currentSong.track.id + 1}</h5>
+          <h5>Currently Playing: Song {currentSong.track.id}</h5>
           <ReactAudioPlayer
             onEnded={handleEnded}
             onListen={handleListen}
@@ -246,7 +251,6 @@ export default function AudioPlaylist(props) {
             onPlay={handlePlay}
             onSeeked={handleSeeked}
             onVolumeChanged={handleVolumeChanged}
-            muted={muted}
             loop={false}
             src={currentSong.track.file_name}
             listenInterval={30000}
@@ -265,7 +269,7 @@ export default function AudioPlaylist(props) {
         </div> */}
           <img src="./images/album_art.jpg" className="card-img-top" alt="artwork" />
           <div className="card-body">
-            <h5 className="card-title">Song {currentSong.track.id + 1}</h5>
+            <h5 className="card-title">Song {currentSong.track.id}</h5>
             <p className="card-text">Original track order used for song title</p>
             <p className="card-text d-flex flex-column">
               <small className="text-muted">
@@ -288,7 +292,6 @@ export default function AudioPlaylist(props) {
               onPlay={handlePlay}
               onSeeked={handleSeeked}
               onVolumeChanged={handleVolumeChanged}
-              muted={muted}
               loop={looped}
               src={currentSong.track.file_name}
               listenInterval={30000}
@@ -388,6 +391,12 @@ export default function AudioPlaylist(props) {
         secondaryBtnText={"Back"}
         show={showShuffleModal}
       />
-    </>
+    </> : (
+      <Row>
+        <Col className='d-flex justify-content-center'>
+          <Spinner animation="grow" />
+        </Col>
+      </Row>
+    )
   )
 }
