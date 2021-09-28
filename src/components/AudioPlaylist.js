@@ -3,7 +3,6 @@ import ReactAudioPlayer from 'react-audio-player';
 import { OverlayTrigger, Tooltip, Spinner, Row, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router';
 import Modal from './Modal';
-import useDeepCompareEffect from 'use-deep-compare-effect';
 import { usePlaylist } from '../utilities/PlaylistContext';
 import { useAuth } from '../utilities/AuthContext';
 import { generateOrderedPlaylist } from '../utilities/algorithmicPlaylistGenerator'
@@ -127,7 +126,7 @@ export default function AudioPlaylist(props) {
 
   const handleListen = () => {
     // percent listened based on song time length (broken up into 10ths)
-    console.log("listening at 1/10th of the song length:", listenInterval)
+    // console.log("listening at 1/10th of the song length:", listenInterval)
     setShuffledPlaylist(prevPlaylist => {
 
       return prevPlaylist.map(prevPlaylistTrack => {
@@ -195,6 +194,12 @@ export default function AudioPlaylist(props) {
     currentSong = props.algorithmicPlaylist[props.currentSongIndex]
   }
 
+  useEffect(() => {
+    if (currentSong) {
+      setListenInterval(prevInterval => Math.floor(currentSong.track.song_length / 10))
+    }
+  }, [props.currentSongIndex, currentSong])
+
   // const currentSong = shuffledPlaylist[props.currentSongIndex]
 
   // const currentSong = (!!props.generating && props.currentSongIndex)
@@ -214,10 +219,6 @@ export default function AudioPlaylist(props) {
   //     </li>
   //   )
   // })
-
-  useDeepCompareEffect(() => {
-    setListenInterval(prevInterval => Math.floor(currentSong.track.song_length / 10))
-  }, [currentSong])
 
   const LikeModule = (
     <div className="btn-group" role="group" aria-label="popularity controls">
