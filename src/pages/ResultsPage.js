@@ -21,6 +21,7 @@ export default function ResultsPage() {
 				<td>{item.track.id}</td>
 				<td>{item.listener_count}</td>
 				<td>{item.rating}</td>
+				{/* TODO: use a progress bar to show rating */}
 				<td>{item.play_count}</td>
 			</tr>
 		)

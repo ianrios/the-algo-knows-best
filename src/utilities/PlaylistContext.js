@@ -26,8 +26,6 @@ export const PlaylistHelper = () => {
     ]
 
     function mapUserDataToPlaylist(userData, setPlaylist) {
-        // TODO: map the user liked tracks to the current playlist (only needed for the experiment page)
-
         if (userData.track_statistics) {
             setPlaylist(prevPlaylist => prevPlaylist.map(currentTrack => {
                 let trackStatisticIndex = userData.track_statistics.findIndex(trackStatistic => trackStatistic.track_id === currentTrack.id)
@@ -60,8 +58,6 @@ export const PlaylistHelper = () => {
             )
         })
     }
-
-
 
     function shufflePlaylist(arr) {
         // Standard Fisher Yates Shuffle Algorithm
@@ -116,7 +112,7 @@ export const PlaylistHelper = () => {
         })
     }
     function updatePlaylistData(currentSongIndex, generating, songEnded) {
-
+        console.log(nextPlaylist)
         setFinalPlaylistResult(prevFinalPlaylistResult => {
             if (prevFinalPlaylistResult.length && nextPlaylist.length) {
                 // if we have data we can look at
