@@ -5,24 +5,22 @@ import AudioPlaylist from '../components/AudioPlaylist'
 import { usePlaylist } from '../utilities/PlaylistContext'
 
 export default function ResultsPage() {
-	const { finalPlaylistResult } = usePlaylist()
+	const { nextPlaylistData } = usePlaylist()
 
 	const [currentSongIndex, setCurrentSongIndex] = useState(0)
-
 
 	// TODO: if playlist updates, dont reset the current song until after it finishes if the current song changes too
 
 	// TODO: map the rest of these table items
 	// TODO: use css to show table rows swapping with a smooth transition
-	const mappedData = finalPlaylistResult.map((item, index) => {
+	const mappedData = nextPlaylistData.map((item, index) => {
 		return (
 			<tr key={index} className={`${index === currentSongIndex ? "table-primary" : ""}`}>
-				<th scope="row">{item.id}</th>
+				<th scope="row">{item.rank}</th>
 				<td>{item.track.id}</td>
-				<td>{item.listeners}</td>
-				{/* TODO: implement likes */}
-				<td>likes</td>
-				<td>{item.num_plays}</td>
+				<td>{item.listener_count}</td>
+				<td>{item.rating}</td>
+				<td>{item.play_count}</td>
 			</tr>
 		)
 	})
@@ -38,7 +36,7 @@ export default function ResultsPage() {
 			<Row>
 				<Col>
 					<AudioPlaylist
-						algorithmicPlaylist={finalPlaylistResult}
+						algorithmicPlaylist={nextPlaylistData}
 						currentSongIndex={currentSongIndex}
 						setCurrentSongIndex={setCurrentSongIndex}
 					/>
@@ -49,7 +47,7 @@ export default function ResultsPage() {
 				<Col>
 					<h2>Statistics</h2>
 					<p>View the data collected from the experiment that is used to generate to the current playlist. <Link className="link-dark" to="/stream">Participate now</Link> to change the data in real time.</p>
-					{finalPlaylistResult.length ? (
+					{nextPlaylistData.length ? (
 
 						<table className="table table-striped">
 							<thead>

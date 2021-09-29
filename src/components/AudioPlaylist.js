@@ -36,7 +36,7 @@ export default function AudioPlaylist(props) {
 
     return arr.map(prevItem => {
       let item = { ...prevItem }
-      item.num_plays = 0
+      item.play_count = 0
       item.placement_liked = 0
       return item
     })
@@ -159,7 +159,7 @@ export default function AudioPlaylist(props) {
       return prevPlaylist.map(prevPlaylistTrack => {
         let playlistTrack = { ...prevPlaylistTrack };
         if (playlistTrack.track.file_name === currentSong.track.file_name) {
-          playlistTrack.num_plays += .1;
+          playlistTrack.play_count += .1;
         }
         return playlistTrack;
       })
@@ -251,7 +251,7 @@ export default function AudioPlaylist(props) {
             onSeeked={handleSeeked}
             onVolumeChanged={handleVolumeChanged}
             loop={false}
-            src={currentSong.track.file_name}
+            src={'./audio/' + currentSong.track.file_name}
             listenInterval={listenInterval}
             className="w-100 rounded"
             autoPlay
@@ -286,7 +286,7 @@ export default function AudioPlaylist(props) {
               onSeeked={handleSeeked}
               onVolumeChanged={handleVolumeChanged}
               loop={looped}
-              src={currentSong.track.file_name}
+              src={'./audio/' + currentSong.track.file_name}
               listenInterval={listenInterval}
               className="w-100 rounded"
               autoPlay

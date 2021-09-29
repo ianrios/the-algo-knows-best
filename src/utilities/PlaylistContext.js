@@ -6,6 +6,8 @@ const PlaylistContext = createContext({});
 // helper function that exports just the needed / wanted data for the provider
 export const PlaylistHelper = () => {
 
+    const [initialLoad, setInitialLoad] = useState(false)
+
     // next state
     const [nextPlaylistData, setNextPlaylistData] = useState([])
     function nextPlaylistDataState(data) {
@@ -22,12 +24,25 @@ export const PlaylistHelper = () => {
         })
     }
     function updatePlaylistData(currentSongIndex) {
-        // if (
-        // (if current song is the same index in both arrays)
-        // || (if current song has ended)) {
-        setFinalPlaylistResult(prevFinalPlaylistResult => nextPlaylistData)
-        // }
+        if (initialLoad) {
+            setFinalPlaylistResult(prevFinalPlaylistResult => {
+                // if current song is the same index in both arrays
+                if (prevFinalPlaylistResult[currentSongIndex].track.file_name === nextPlaylistData[currentSongIndex].track.file_name) {
+                    return nextPlaylistData
+                }
+                // if current song has ended
+                // if () {
+                //     return nextPlaylistData
+                // }
+                return prevFinalPlaylistResult
+            })
+        }
     }
+    useEffect(() => {
+        updatePlaylistData()
+        // console.log("resulting playlist:", nextPlaylistData)
+
+    }, [nextPlaylistData])
 
     // save new playlist to database
     function saveNewPlaylist(data, token, newPlaylist, failureMethod) {
