@@ -183,39 +183,33 @@ export default function AudioPlaylist(props) {
     setPlaylistPreference(prevStatus => prevStatus === -1 ? 0 : -1)
   }
   const handleTrackLike = () => {
-    console.log("liking:", currentSong)
     props.setPlaylist(prevPlaylist => {
-      let mappedPlaylist = prevPlaylist.map((item, idx) => {
+      let mappedPlaylist = [...prevPlaylist].map((playlistTrack, idx) => {
+        let newPlaylistTrack = { ...playlistTrack }
         if (index === idx) {
-          console.log('found the index:', item)
-          let newPreference = item.track.preference === 1 ? 0 : 1
-          console.log(`item: ${item.track.preference} will become: ${newPreference}`)
-          item.track.preference = newPreference
+          let newTrack = { ...newPlaylistTrack.track }
+          let newPreference = newTrack.preference === 1 ? 0 : 1
+          newTrack.preference = newPreference
+          newPlaylistTrack.track = newTrack
         }
-        return item
+        return newPlaylistTrack
       })
       return mappedPlaylist
-      // let newPlaylist = [...prevPlaylist]
-      // newPlaylist[index].preference = prevPlaylist[index].preference === 1 ? 0 : 1
-      // return newPlaylist
     })
   }
   const handleTrackDislike = () => {
-    console.log("disliking:", currentSong)
     props.setPlaylist(prevPlaylist => {
-      let mappedPlaylist = prevPlaylist.map((item, idx) => {
+      let mappedPlaylist = [...prevPlaylist].map((playlistTrack, idx) => {
+        let newPlaylistTrack = { ...playlistTrack }
         if (index === idx) {
-          console.log('found the index:', item)
-          let newPreference = item.track.preference === -1 ? 0 : -1
-          console.log(`item: ${item.track.preference} will become: ${newPreference}`)
-          item.track.preference = newPreference
+          let newTrack = { ...newPlaylistTrack.track }
+          let newPreference = newTrack.preference === -1 ? 0 : -1
+          newTrack.preference = newPreference
+          newPlaylistTrack.track = newTrack
         }
-        return item
+        return newPlaylistTrack
       })
       return mappedPlaylist
-      // let newPlaylist = [...prevPlaylist]
-      // newPlaylist[index].preference = prevPlaylist[index].preference === 1 ? 0 : 1
-      // return newPlaylist
     })
   }
   const handlePlacementLike = () => {
