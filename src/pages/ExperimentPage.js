@@ -1,10 +1,27 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Row, Col } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import AudioPlaylist from '../components/AudioPlaylist'
+import { useAuth } from '../utilities/AuthContext'
+import { usePlaylist } from '../utilities/PlaylistContext'
+import useDeepCompareEffect from 'use-deep-compare-effect'
 
 export default function ExperimentPage() {
+  const { updateUser, userData } = useAuth()
+  const { mapUserDataToPlaylist, generateOrderedPlaylist, shufflePlaylist } = usePlaylist()
+  // TODO: map user data for likes to current playlist tracks for conditional rendering
+
+  const [shuffledPlaylist, setShuffledPlaylist] = useState(shufflePlaylist(generateOrderedPlaylist()))
+
   const [currentSongIndex, setCurrentSongIndex] = useState(0)
+  useEffect(() => {
+    updateUser()
+  }, [])
+
+  useDeepCompareEffect(() => {
+    mapUserDataToPlaylist(userData, setShuffledPlaylist)
+  }, [userData])
+
   return (
     <>
       <Row>
@@ -20,6 +37,8 @@ export default function ExperimentPage() {
       <Row>
         <Col sm="12" md={{ span: 6, offset: 3 }} lg={{ span: 4, offset: 4 }}>
           <AudioPlaylist
+            playlist={shuffledPlaylist}
+            setPlaylist={setShuffledPlaylist}
             currentSongIndex={currentSongIndex}
             setCurrentSongIndex={setCurrentSongIndex}
             generating

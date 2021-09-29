@@ -6,49 +6,153 @@ const PlaylistContext = createContext({});
 // helper function that exports just the needed / wanted data for the provider
 export const PlaylistHelper = () => {
 
-    const [initialLoad, setInitialLoad] = useState(false)
+    const songLengths = [
+        39778,
+        42872,
+        39111,
+        33153,
+        34305,
+        40556,
+        39559,
+        42451,
+        37662,
+        45667,
+        44555,
+        48004,
+        45163,
+        45695,
+        43243,
+        50109
+    ]
 
-    // next state
-    const [nextPlaylistData, setNextPlaylistData] = useState([])
-    function nextPlaylistDataState(data) {
-        setNextPlaylistData(prevFinalPlaylistResult => data.data)
+    function mapUserDataToPlaylist(userData, setPlaylist) {
+        // TODO: map the user liked tracks to the current playlist (only needed for the experiment page)
+
+        if (userData.track_statistics) {
+            setPlaylist(prevPlaylist => prevPlaylist.map(currentTrack => {
+                let trackStatisticIndex = userData.track_statistics.findIndex(trackStatistic => trackStatistic.track_id === currentTrack.id)
+                currentTrack.track.preference = userData.track_statistics[trackStatisticIndex].preference
+                return currentTrack
+            }))
+        }
     }
 
+    function generateOrderedPlaylist() {
+        return songLengths.map((songLength, index) => {
+            const id = index + 1
+            return (
+                {
+                    id: id, //created on backend, generated for front end using index
+                    rank: id,
+                    rating: 0,
+                    // order: to be created based on final resulting index in array
+                    // playlist_id: to be created on backend,
+                    listener_count: 0, //
+                    placement_liked: 0, // 0 neutral, 1 positive, -1 negative
+                    play_count: 0.0, // percent listened based on skips, pauses, loops, or restarts
+                    track: {
+                        id: id,
+                        preference: 0, // 0 neutral, 1 positive, -1 negative
+                        song_length: songLength,
+                        file_name: `T00${id > 9 ? id : "0" + id}.wav`
+                    }
+                }
+            )
+        })
+    }
+
+
+
+    function shufflePlaylist(arr) {
+        // Standard Fisher Yates Shuffle Algorithm
+        let currIdx = arr.length, randIdx;
+
+        // While there remain elements to shuffle...
+        while (currIdx !== 0) {
+
+            // Pick a remaining element...
+            randIdx = Math.floor(Math.random() * currIdx);
+            currIdx--;
+
+            // And swap it with the current element.
+            [arr[currIdx], arr[randIdx]] = [arr[randIdx], arr[currIdx]];
+        }
+
+        // code to reset array statistics
+        return arr.map((prevItem, index) => {
+            let item = { ...prevItem }
+
+            item.rank = index + 1
+            item.rating = 0
+            item.listener_count = 0
+            item.placement_liked = 0
+            item.play_count = 0.0
+            item.track.preference = 0
+
+            return item
+        })
+    }
+
+
+
+    // next state
+    const [nextPlaylist, setNextPlaylist] = useState([])
+    function saveNextPlaylist(data) {
+        setNextPlaylist(prevNextPlaylist => data.data)
+    }
 
     // final result
     const [finalPlaylistResult, setFinalPlaylistResult] = useState([])
-    function getFinalPlaylistResult() {
+    useEffect(() => {
+        // on mount - create new instance of playlist to look at 
+        setFinalPlaylistResult(generateOrderedPlaylist())
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    function getFinalPlaylistNextResult() {
         axiosHelper({
             url: '/api/playlist/result',
-            successMethod: nextPlaylistDataState,
+            successMethod: saveNextPlaylist,
         })
     }
-    function updatePlaylistData(currentSongIndex) {
-        if (initialLoad) {
-            setFinalPlaylistResult(prevFinalPlaylistResult => {
-                // if current song is the same index in both arrays
-                if (prevFinalPlaylistResult[currentSongIndex].track.file_name === nextPlaylistData[currentSongIndex].track.file_name) {
-                    return nextPlaylistData
-                }
-                // if current song has ended
-                // if () {
-                //     return nextPlaylistData
-                // }
-                return prevFinalPlaylistResult
-            })
-        }
-    }
-    useEffect(() => {
-        updatePlaylistData()
-        // console.log("resulting playlist:", nextPlaylistData)
+    function updatePlaylistData(currentSongIndex, generating, songEnded) {
 
-    }, [nextPlaylistData])
+        setFinalPlaylistResult(prevFinalPlaylistResult => {
+            if (prevFinalPlaylistResult.length && nextPlaylist.length) {
+                // if we have data we can look at
+
+                if (generating) {
+                    // if we are currently generating data, we can update the result, no worries
+                    return nextPlaylist
+                }
+                if (songEnded) {
+                    // if current song has ended
+                    return nextPlaylist
+                }
+                if (prevFinalPlaylistResult[currentSongIndex].track.file_name === nextPlaylist[currentSongIndex].track.file_name) {
+                    // if current song is the same index in both arrays
+                    return nextPlaylist
+                }
+                else {
+                    // songs do not match, but we still need the data
+                    // TODO: we need to return safely somehow
+                    return nextPlaylist
+                }
+
+
+            }
+            // no conditions were met, return same playlist we are currently listening to
+            return prevFinalPlaylistResult
+        })
+    }
+
+
 
     // save new playlist to database
     function saveNewPlaylist(data, token, newPlaylist, failureMethod) {
         const successMethod = () => {
             newPlaylist()
-            getFinalPlaylistResult()
+            getFinalPlaylistNextResult()
         }
         axiosHelper({
             data,
@@ -74,16 +178,21 @@ export const PlaylistHelper = () => {
 
     // on mount, get final result from database
     useEffect(() => {
-        getFinalPlaylistResult()
+        getFinalPlaylistNextResult()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return {
+        mapUserDataToPlaylist,
+
+        generateOrderedPlaylist,
+        shufflePlaylist,
+
         saveNewPlaylist,
 
-        nextPlaylistData, // temporarily here to view in console.log
         finalPlaylistResult,
-        // getFinalPlaylistResult,
+        getFinalPlaylistNextResult,
+
         updatePlaylistData,
 
         allPlaylistData,

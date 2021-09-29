@@ -12,8 +12,16 @@ export const AuthHelper = () => {
 
   // user specific
   function saveUserData(data) {
-    setUserData(data);
-    window.localStorage.setItem('user_data', JSON.stringify(data))
+    console.log(data)
+    if (data.status) {
+      setUserData(data.data);
+      window.localStorage.setItem('user_data', JSON.stringify(data.data))
+    }
+    else {
+      setUserData(data);
+      window.localStorage.setItem('user_data', JSON.stringify(data))
+    }
+
   }
 
   function saveToken(data) {
@@ -38,6 +46,7 @@ export const AuthHelper = () => {
     })
   }
 
+
   function getUser(token) {
     axiosHelper({
       method: 'get',
@@ -46,6 +55,11 @@ export const AuthHelper = () => {
       failureMethod: destroyStorage,
       token
     })
+  }
+  function updateUser() {
+    if (token) {
+      getUser(token)
+    }
   }
 
   function login(data) {
@@ -105,10 +119,22 @@ export const AuthHelper = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    if (token) {
+      axiosHelper({
+        method: 'get',
+        url: '/api/auth/status',
+        successMethod: res => res,
+        failureMethod: destroyStorage,
+        token
+      })
+    }
+  }, [token])
+
 
 
   return {
-    token, userData, logout, destroyStorage
+    token, userData, logout, destroyStorage, updateUser
   }
 }
 

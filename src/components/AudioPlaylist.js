@@ -5,46 +5,23 @@ import { useHistory } from 'react-router';
 import Modal from './Modal';
 import { usePlaylist } from '../utilities/PlaylistContext';
 import { useAuth } from '../utilities/AuthContext';
-import { generateOrderedPlaylist } from '../utilities/algorithmicPlaylistGenerator'
 import Icon from './Icon'
 
 export default function AudioPlaylist(props) {
+  const playlist = props.playlist
+  const index = props.currentSongIndex
+  const currentSong = playlist[index]
 
-  const { saveNewPlaylist, getFinalPlaylistResult } = usePlaylist()
-  const { token, destroyStorage } = useAuth()
+  const { shufflePlaylist, saveNewPlaylist, getFinalPlaylistNextResult, updatePlaylistData } = usePlaylist()
+  const { token, destroyStorage, updateUser } = useAuth()
 
   const history = useHistory()
 
   const newPlaylist = () => {
-    setLikedStatus(prev => 'neutral')
+    setLooped(false)
+    setPlaylistPreference(prev => 0)
+    updateUser()
   }
-
-  const shufflePlaylist = arr => {
-    // Standard Fisher Yates Shuffle Algorithm
-    let currIdx = arr.length, randIdx;
-
-    // While there remain elements to shuffle...
-    while (currIdx !== 0) {
-
-      // Pick a remaining element...
-      randIdx = Math.floor(Math.random() * currIdx);
-      currIdx--;
-
-      // And swap it with the current element.
-      [arr[currIdx], arr[randIdx]] = [arr[randIdx], arr[currIdx]];
-    }
-
-    return arr.map(prevItem => {
-      let item = { ...prevItem }
-      item.play_count = 0
-      item.placement_liked = 0
-      return item
-    })
-  }
-
-  const playlist = generateOrderedPlaylist()
-
-  const [shuffledPlaylist, setShuffledPlaylist] = useState(shufflePlaylist(playlist))
 
   // Ending Modal Code
   const [showEndingModal, setShowEndingModal] = useState(false);
@@ -72,9 +49,9 @@ export default function AudioPlaylist(props) {
 
   // Audio Object Code
   const handleShuffle = () => {
-    setShuffledPlaylist(prevPlaylist => {
+    props.setPlaylist(prevPlaylist => {
       const data = {
-        preference: likedStatus,
+        preference: playlistPreference,
         playlistData: prevPlaylist
       }
       saveNewPlaylist(data, token, newPlaylist, destroyStorage)
@@ -85,7 +62,6 @@ export default function AudioPlaylist(props) {
   const handleEnded = () => {
     if (!looped) {
       props.setCurrentSongIndex(prevIndex => {
-        getFinalPlaylistResult()
         if (prevIndex + 1 >= playlist.length) {
           if (!!props.generating) {
             handleShowEndingModal()
@@ -127,51 +103,47 @@ export default function AudioPlaylist(props) {
     setLooped(prev => !prev)
   }
 
-
   const [listenInterval, setListenInterval] = useState(30000)
 
-  let currentSong;
-  if (!!props.generating) {
-    currentSong = shuffledPlaylist[props.currentSongIndex]
-  }
-  else {
-    currentSong = props.algorithmicPlaylist[props.currentSongIndex]
-  }
+  useEffect(() => {
+    getFinalPlaylistNextResult()
+    updatePlaylistData(index, !!props.generating, true)
+  }, [listenInterval])
 
   useEffect(() => {
     if (currentSong) {
       setListenInterval(prevInterval => {
         let newInterval = Math.floor(currentSong.track.song_length / 10)
         if (prevInterval !== newInterval) {
-          // console.log("setting interval")
           return newInterval
         }
         return prevInterval
       })
     }
-  }, [props.currentSongIndex, currentSong])
+  }, [index, currentSong])
 
   // listen interval code
   const handleListen = () => {
     // percent listened based on song time length (broken up into 10ths)
-    // console.log("listening at 1/10th of the song length:", listenInterval)
-    setShuffledPlaylist(prevPlaylist => {
-      return prevPlaylist.map(prevPlaylistTrack => {
-        let playlistTrack = { ...prevPlaylistTrack };
-        if (playlistTrack.track.file_name === currentSong.track.file_name) {
-          playlistTrack.play_count += .1;
-        }
-        return playlistTrack;
+    updatePlaylistData(index, !!props.generating, false)
+    if (!!props.generating) {
+      props.setPlaylist(prevPlaylist => {
+        return prevPlaylist.map(prevPlaylistTrack => {
+          let playlistTrack = { ...prevPlaylistTrack };
+          if (playlistTrack.track.file_name === currentSong.track.file_name) {
+            playlistTrack.play_count += .1;
+          }
+          return playlistTrack;
+        })
       })
-    })
+    }
   }
 
+  // TODO: use current song audio duration instead of saving this data in database
   // useEffect(() => {
   //   if (currentSong) {
   //     // if (currentSong.track.file_name) {
   //     setListenInterval(prevInterval => {
-  //       // TODO: use current song audio duration instead of saving this data in database
-  //       console.log('setting interval:', currentSong.track.song_length)
   //       // let audio = document.querySelector('audio')
   //       // let newInterval = Math.floor(audio.duration * 100)
   //       // return newInterval
@@ -180,7 +152,7 @@ export default function AudioPlaylist(props) {
   //     // }
   //   }
   // }, [
-  //   props.currentSongIndex, currentSong
+  //   index, currentSong
   // ])
 
 
@@ -202,34 +174,79 @@ export default function AudioPlaylist(props) {
   }
 
   // liked status code
-  const [likedStatus, setLikedStatus] = useState("neutral")
-  const handleLike = () => {
-    setLikedStatus(prevStatus => prevStatus === "positive" ? "neutral" : "positive")
+  // TODO: convert to integer to better integrate with database
+  const [playlistPreference, setPlaylistPreference] = useState(0)
+  const handlePlaylistLike = () => {
+    setPlaylistPreference(prevStatus => prevStatus === 1 ? 0 : 1)
   }
-  const handleDislike = () => {
-    setLikedStatus(prevStatus => prevStatus === "negative" ? "neutral" : "negative")
+  const handlePlaylistDislike = () => {
+    setPlaylistPreference(prevStatus => prevStatus === -1 ? 0 : -1)
+  }
+  const handleTrackLike = () => {
+    console.log("liking:", currentSong)
+    props.setPlaylist(prevPlaylist => {
+      let mappedPlaylist = prevPlaylist.map((item, idx) => {
+        if (index === idx) {
+          console.log('found the index:', item)
+          let newPreference = item.track.preference === 1 ? 0 : 1
+          console.log(`item: ${item.track.preference} will become: ${newPreference}`)
+          item.track.preference = newPreference
+        }
+        return item
+      })
+      return mappedPlaylist
+      // let newPlaylist = [...prevPlaylist]
+      // newPlaylist[index].preference = prevPlaylist[index].preference === 1 ? 0 : 1
+      // return newPlaylist
+    })
+  }
+  const handleTrackDislike = () => {
+    console.log("disliking:", currentSong)
+    props.setPlaylist(prevPlaylist => {
+      let mappedPlaylist = prevPlaylist.map((item, idx) => {
+        if (index === idx) {
+          console.log('found the index:', item)
+          let newPreference = item.track.preference === -1 ? 0 : -1
+          console.log(`item: ${item.track.preference} will become: ${newPreference}`)
+          item.track.preference = newPreference
+        }
+        return item
+      })
+      return mappedPlaylist
+      // let newPlaylist = [...prevPlaylist]
+      // newPlaylist[index].preference = prevPlaylist[index].preference === 1 ? 0 : 1
+      // return newPlaylist
+    })
+  }
+  const handlePlacementLike = () => {
+    // setPlaylistPreference(prevStatus => prevStatus === 1 ? 0 : 1)
+  }
+  const handlePlacementDislike = () => {
+    // setPlaylistPreference(prevStatus => prevStatus === -1 ? 0 : -1)
   }
 
-  const LikeModule = (dislikeMethod, likeMethod) => (
-    <div className="btn-group" role="group" aria-label="popularity controls">
-      <button type="button" className="btn btn-outline-primary" onClick={dislikeMethod}>
-        {(likedStatus === "neutral" || likedStatus === "positive") && <Icon type='hand-thumbs-down' />}
-        {likedStatus === "negative" && <Icon type='hand-thumbs-down-fill' />}
-      </button>
-      <button type="button" className="btn btn-outline-primary" onClick={likeMethod}>
-        {(likedStatus === "neutral" || likedStatus === "negative") && <Icon type='hand-thumbs-up' />}
-        {likedStatus === "positive" && <Icon type='hand-thumbs-up-fill' />}
-      </button>
-    </div>
-  )
-
+  const LikeModule = (dislikeMethod, likeMethod, state, location) => {
+    console.log('rendering like module in ' + location + " :", state)
+    return (
+      <div className="btn-group" role="group" aria-label="popularity controls">
+        <button type="button" className="btn btn-outline-primary" onClick={dislikeMethod}>
+          {(state === 0 || state === 1) && <Icon type='hand-thumbs-down' />}
+          {state === -1 && <Icon type='hand-thumbs-down-fill' />}
+        </button>
+        <button type="button" className="btn btn-outline-primary" onClick={likeMethod}>
+          {(state === 0 || state === -1) && <Icon type='hand-thumbs-up' />}
+          {state === 1 && <Icon type='hand-thumbs-up-fill' />}
+        </button>
+      </div>
+    )
+  }
   useEffect(() => {
     // Component Will Unmount  
     return function cleanup() {
-      if (!!!props.generating) {
+      if (!!props.generating) {
         const data = {
-          preference: likedStatus,
-          playlistData: shuffledPlaylist
+          preference: playlistPreference,
+          playlistData: playlist
         }
         saveNewPlaylist(data, token, newPlaylist, destroyStorage)
       }
@@ -238,8 +255,8 @@ export default function AudioPlaylist(props) {
   }, []);
 
   return (
-    currentSong ? <>
-      {(!!!props.generating && props.algorithmicPlaylist.length > 0) ?
+    currentSong && props.playlist.length > 0 ? <>
+      {(!!!props.generating) ?
         <>
           <h5>Currently Playing: Song {currentSong.track.id}</h5>
           <ReactAudioPlayer
@@ -266,11 +283,11 @@ export default function AudioPlaylist(props) {
             <p className="card-text">Original track order used for song title</p>
             <p className="card-text d-flex flex-column">
               <small className="text-muted">
-                Track {props.currentSongIndex + 1} of {playlist.length} in shuffled playlist
+                Track {index + 1} of {playlist.length} in shuffled playlist
               </small>
               <small className="text-muted">
                 <span className="badge bg-secondary rounded-pill float-right">
-                  {playlist.length - props.currentSongIndex - 1}</span> songs left
+                  {playlist.length - index - 1}</span> songs left
               </small>
               {/* TODO: move like/dislike song here */}
               {/* TODO: add ability to like/dislike placement here */}
@@ -321,6 +338,9 @@ export default function AudioPlaylist(props) {
               </OverlayTrigger>
             </div>
 
+            {LikeModule(handleTrackDislike, handleTrackLike, currentSong.track.preference, 'track')}
+
+
             <div className="btn-group mx-2" role="group" aria-label="audio controls">
               <OverlayTrigger
                 placement="top"
@@ -350,30 +370,32 @@ export default function AudioPlaylist(props) {
           </div>
         </div>
       }
-      <Modal
-        handleClose={closeAndRepeat}
-        primaryButtonClickHandler={viewResults}
-        secondaryButtonClickHandler={closeAndRepeat}
-        infoButtonClickHandler={confirmShuffleModal}
-        likeModule={LikeModule(handleDislike, handleLike)}
-        titleText={"End of Playlist"}
-        bodyText={"You have listened through the randomly generated playlist. Feel free to view the results, or generate a new playlist. If you close the modal without choosing an option, the playlist you were crafted will continue to play on loop."}
-        primaryBtnText={"View Results"}
-        secondaryBtnText={"Close and Continue Listening"}
-        infoBtnText={"Generate New Experience"}
-        show={showEndingModal}
-      />
-      <Modal
+      {showEndingModal &&
+        <Modal
+          handleClose={closeAndRepeat}
+          primaryButtonClickHandler={viewResults}
+          secondaryButtonClickHandler={closeAndRepeat}
+          infoButtonClickHandler={confirmShuffleModal}
+          likeModule={LikeModule(handlePlaylistDislike, handlePlaylistLike, playlistPreference, 'end modal')}
+          titleText={"End of playlist"}
+          bodyText={"You have listened through the randomly generated playlist. Feel free to view the results, or generate a new playlist. If you close the modal without choosing an option, the playlist you were crafted will continue to play on loop."}
+          primaryBtnText={"View Results"}
+          secondaryBtnText={"Close and Continue Listening"}
+          infoBtnText={"Generate New Experience"}
+          show={showEndingModal}
+        />}
+      {showShuffleModal && <Modal
         handleClose={closeShuffleModal}
         primaryButtonClickHandler={confirmShuffleModal}
         secondaryButtonClickHandler={closeShuffleModal}
-        likeModule={LikeModule(handleDislike, handleLike)}
+        likeModule={LikeModule(handlePlaylistDislike, handlePlaylistLike, playlistPreference, 'shuffle modal')}
         titleText={"New Playist?"}
         bodyText={"By pressing the shuffle button, your listening experience will be re-crafted with a new randomly generated tracklist."}
         primaryBtnText={"Continue"}
         secondaryBtnText={"Back"}
         show={showShuffleModal}
       />
+      }
     </> : (
       <Row>
         <Col className='d-flex justify-content-center'>
