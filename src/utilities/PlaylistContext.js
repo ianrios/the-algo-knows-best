@@ -25,12 +25,20 @@ export const PlaylistHelper = () => {
         50109
     ]
 
+    // do this on backend
     function mapUserDataToPlaylist(userData, setPlaylist) {
-        if (userData.track_statistics) {
+        if (userData.track_statistics && userData.track_statistics.length > 0) {
             setPlaylist(prevPlaylist => prevPlaylist.map(currentTrack => {
-                let trackStatisticIndex = userData.track_statistics.findIndex(trackStatistic => trackStatistic.track_id === currentTrack.id)
-                currentTrack.track.preference = userData.track_statistics[trackStatisticIndex].preference
-                return currentTrack
+                let newPlaylistTrack = { ...currentTrack }
+                let trackStatisticIndex = userData.track_statistics.findIndex(trackStatistic => trackStatistic.track_id === newPlaylistTrack.id)
+                let newTrack = { ...newPlaylistTrack.track }
+
+                // console.log('map user data to playlist', newPlaylistTrack.id)
+                // console.log(userData.track_statistics[trackStatisticIndex].preference)
+                newTrack.preference = userData.track_statistics[trackStatisticIndex].preference
+
+                newPlaylistTrack.track = newTrack
+                return newPlaylistTrack
             }))
         }
     }
@@ -112,7 +120,7 @@ export const PlaylistHelper = () => {
         })
     }
     function updatePlaylistData(currentSongIndex, generating, songEnded) {
-        console.log(nextPlaylist)
+        // console.log(nextPlaylist)
         setFinalPlaylistResult(prevFinalPlaylistResult => {
             if (prevFinalPlaylistResult.length && nextPlaylist.length) {
                 // if we have data we can look at
@@ -146,14 +154,19 @@ export const PlaylistHelper = () => {
 
     // save new playlist to database
     function saveNewPlaylist(data, token, newPlaylist, failureMethod) {
+
+        // TODO: figure out why token is not getting sent from authContext
+        let lsToken = window.localStorage.getItem('token');
+
         const successMethod = () => {
             newPlaylist()
             getFinalPlaylistNextResult()
         }
+        console.log({ data, token, lsToken })
         axiosHelper({
             data,
             method: 'post',
-            token,
+            token: lsToken,
             url: '/api/playlist/save',
             successMethod,
             failureMethod,

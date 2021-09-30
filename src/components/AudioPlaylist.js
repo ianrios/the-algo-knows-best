@@ -13,7 +13,12 @@ export default function AudioPlaylist(props) {
   const currentSong = playlist[index]
 
   const { shufflePlaylist, saveNewPlaylist, getFinalPlaylistNextResult, updatePlaylistData } = usePlaylist()
-  const { token, destroyStorage, updateUser } = useAuth()
+  const { token, destroyStorage, updateUser, saveTokenFromLS } = useAuth()
+
+  useEffect(() => {
+    saveTokenFromLS()
+    console.log("on mount of audio", { token })
+  }, [token])
 
   const history = useHistory()
 

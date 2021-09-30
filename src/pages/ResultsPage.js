@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Row, Col, OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap'
+import { Row, Col, OverlayTrigger, Tooltip, Spinner, ProgressBar } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import AudioPlaylist from '../components/AudioPlaylist'
 import { usePlaylist } from '../utilities/PlaylistContext'
@@ -14,18 +14,25 @@ export default function ResultsPage() {
 	// TODO: add "last updated at" timestamp
 	// TODO: map the rest of these table items
 	// TODO: use css to show table rows swapping with a smooth transition
-	const mappedData = finalPlaylistResult.map((item, index) => {
-		return (
-			<tr key={index} className={`${index === currentSongIndex ? "table-primary" : ""}`}>
-				<th scope="row">{item.rank}</th>
-				<td>{item.track.id}</td>
-				<td>{item.listener_count}</td>
-				<td>{item.rating}</td>
-				{/* TODO: use a progress bar to show rating */}
-				<td>{item.play_count}</td>
-			</tr>
-		)
-	})
+	const mappedData = finalPlaylistResult
+		.sort((a, b) => a.rank - b.rank)
+		.map((item, index) => {
+			return (
+				<tr key={index} className={`${index === currentSongIndex ? "table-primary" : ""}`}>
+					<th scope="row">{index}</th>
+					<td>{item.track.id}</td>
+					<td>{item.listener_count}</td>
+					<td>
+						{/* <ProgressBar now={item.rating} /> */}
+						{/* out of 100 */}
+						{item.rating}
+					</td>
+
+					{/* TODO: use a progress bar to show rating */}
+					<td>{item.play_count.toFixed(1)}</td>
+				</tr>
+			)
+		})
 	// TODO: show "you are viewing data collected from x date to y date"
 	return (
 		<>
@@ -59,13 +66,13 @@ export default function ResultsPage() {
 											placement="top"
 											overlay={
 												<Tooltip id={`tooltip-top`}>
-													Generated on the backend; Looks at all track information present on this table, as well as playlist specific information such as percent listened, playlist preference ranking, retention time, and more. Visit <Link to="/info">Info</Link> to learn more
+													Looks at all track information present on this table, as well as playlist specific information such as percent listened, playlist preference ranking, retention time, and more. Visit <Link to="/info">Info</Link> to learn more
 												</Tooltip>
 											}
 										>
 											<span>
-												<span className="d-none d-md-block">ML{" "}</span>Ranking
-												<span className="d-none d-lg-block"><Link to='/info'>Learn More</Link></span>
+												<span className="d-none d-md-block w-25">ML{" "}</span>Ranking
+												<span className="d-none d-lg-block w-50"><Link to='/info'>Learn More</Link></span>
 											</span>
 										</OverlayTrigger>
 									</th>
@@ -74,6 +81,7 @@ export default function ResultsPage() {
 										<span className="d-none d-lg-block">Original</span>
 										<span className="d-md-none d-sm-block">Order</span>
 										<span className="d-none d-md-block">Tracklist</span>
+										<span className="d-none d-xl-block">Placement</span>
 									</th>
 									<th scope="col">
 										<OverlayTrigger
@@ -84,7 +92,7 @@ export default function ResultsPage() {
 												</Tooltip>
 											}
 										>
-											<span>Listeners</span>
+											<span><span className="d-none d-md-block w-25">Unique</span>Listeners</span>
 										</OverlayTrigger>
 									</th>
 									<th scope="col">
@@ -96,7 +104,9 @@ export default function ResultsPage() {
 												</Tooltip>
 											}
 										>
-											<span>Likes<span className="d-none d-lg-block w-25">{" "}(Popularity)</span></span>
+											<span>Rating
+												{/* <span className="d-none d-lg-block w-25">{" "}(Popularity)</span> */}
+											</span>
 										</OverlayTrigger>
 									</th>
 									<th scope="col">

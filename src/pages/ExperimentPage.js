@@ -8,7 +8,7 @@ import useDeepCompareEffect from 'use-deep-compare-effect'
 
 export default function ExperimentPage() {
   const { updateUser, userData } = useAuth()
-  const { mapUserDataToPlaylist, generateOrderedPlaylist, shufflePlaylist } = usePlaylist()
+  const {mapUserDataToPlaylist, generateOrderedPlaylist, shufflePlaylist } = usePlaylist()
   // TODO: map user data for likes to current playlist tracks for conditional rendering
 
   const [shuffledPlaylist, setShuffledPlaylist] = useState(shufflePlaylist(generateOrderedPlaylist()))
