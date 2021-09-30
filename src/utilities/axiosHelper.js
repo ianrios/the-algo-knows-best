@@ -11,6 +11,9 @@ export function axiosHelper(props) {
 		failureMethod = e => console.log(e)
 	} = props; // setting default prop values
 
+	const finalData = JSON.parse(JSON.stringify(data))
+	console.log({ url, finalData })
+
 	return axios({
 		method,
 		url: API_URL + url,
@@ -23,7 +26,7 @@ export function axiosHelper(props) {
 			// 'Access-Control-Allow-Credentials': true,
 			'Authorization': 'Bearer ' + token
 		},
-		data
+		data: finalData
 	})
 		.then(successMethod)
 		.catch(failureMethod)

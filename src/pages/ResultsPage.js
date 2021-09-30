@@ -19,7 +19,7 @@ export default function ResultsPage() {
 		.map((item, index) => {
 			return (
 				<tr key={index} className={`${index === currentSongIndex ? "table-primary" : ""}`}>
-					<th scope="row">{index}</th>
+					<th scope="row">{item.rank}</th>
 					<td>{item.track.id}</td>
 					<td>{item.listener_count}</td>
 					<td>

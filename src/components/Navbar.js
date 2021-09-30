@@ -24,6 +24,7 @@ export default function NavbarModule() {
             <Nav.Link className="nav-link" as={NavLink} eventKey={4} activeClassName="active" to="/info">
               Info
             </Nav.Link>
+            {/* TODO: add page to listen to other peoples playlist creations and rate them */}
           </Nav>
         </Navbar.Collapse>
       </Container>

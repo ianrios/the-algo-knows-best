@@ -12,7 +12,7 @@ export default function AudioPlaylist(props) {
   const index = props.currentSongIndex
   const currentSong = playlist[index]
 
-  const { shufflePlaylist, saveNewPlaylist, getFinalPlaylistNextResult, updatePlaylistData } = usePlaylist()
+  const { saveNewPlaylist, getFinalPlaylistNextResult, updatePlaylistData } = usePlaylist()
   const { token, destroyStorage, updateUser, saveTokenFromLS } = useAuth()
 
   useEffect(() => {
@@ -25,7 +25,8 @@ export default function AudioPlaylist(props) {
   const newPlaylist = () => {
     setLooped(false)
     setPlaylistPreference(prev => 0)
-    updateUser()
+    // updateUser()
+    props.setCurrentSongIndex(prevIndex => 0)
   }
 
   // Ending Modal Code
@@ -33,7 +34,6 @@ export default function AudioPlaylist(props) {
   const handleShowEndingModal = () => setShowEndingModal(true);
   const closeAndRepeat = () => {
     setShowEndingModal(false);
-    props.setCurrentSongIndex(prevIndex => 0)
   }
   const viewResults = () => {
     setShowEndingModal(false);
@@ -54,15 +54,11 @@ export default function AudioPlaylist(props) {
 
   // Audio Object Code
   const handleShuffle = () => {
-    props.setPlaylist(prevPlaylist => {
-      const data = {
-        preference: playlistPreference,
-        playlistData: prevPlaylist
-      }
-      saveNewPlaylist(data, token, newPlaylist, destroyStorage)
-      return [...shufflePlaylist(prevPlaylist)]
-    })
-    props.setCurrentSongIndex(prevIndex => 0)
+    const data = {
+      preference: playlistPreference,
+      playlistData: JSON.parse(JSON.stringify(playlist))
+    }
+    saveNewPlaylist(data, token, newPlaylist, destroyStorage, props.setPlaylist)
   }
   const handleEnded = () => {
     if (!looped) {
@@ -192,10 +188,7 @@ export default function AudioPlaylist(props) {
       let mappedPlaylist = [...prevPlaylist].map((playlistTrack, idx) => {
         let newPlaylistTrack = { ...playlistTrack }
         if (index === idx) {
-          let newTrack = { ...newPlaylistTrack.track }
-          let newPreference = newTrack.preference === 1 ? 0 : 1
-          newTrack.preference = newPreference
-          newPlaylistTrack.track = newTrack
+          newPlaylistTrack.preference = newPlaylistTrack.preference === 1 ? 0 : 1
         }
         return newPlaylistTrack
       })
@@ -207,10 +200,7 @@ export default function AudioPlaylist(props) {
       let mappedPlaylist = [...prevPlaylist].map((playlistTrack, idx) => {
         let newPlaylistTrack = { ...playlistTrack }
         if (index === idx) {
-          let newTrack = { ...newPlaylistTrack.track }
-          let newPreference = newTrack.preference === -1 ? 0 : -1
-          newTrack.preference = newPreference
-          newPlaylistTrack.track = newTrack
+          newPlaylistTrack.preference = newPlaylistTrack.preference === -1 ? 0 : -1
         }
         return newPlaylistTrack
       })
@@ -241,15 +231,16 @@ export default function AudioPlaylist(props) {
   }
   useEffect(() => {
     // Component Will Unmount  
-    return function cleanup() {
-      if (!!props.generating) {
-        const data = {
-          preference: playlistPreference,
-          playlistData: playlist
-        }
-        saveNewPlaylist(data, token, newPlaylist, destroyStorage)
-      }
-    }
+    // TODO: this might be breaking the code
+    // return function cleanup() {
+    //   if (!!props.generating) {
+    //     const data = {
+    //       preference: playlistPreference,
+    //       playlistData: JSON.parse(JSON.stringify(playlist))
+    //     }
+    //     saveNewPlaylist(data, token, newPlaylist, destroyStorage)
+    //   }
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -337,7 +328,7 @@ export default function AudioPlaylist(props) {
               </OverlayTrigger>
             </div>
 
-            {LikeModule(handleTrackDislike, handleTrackLike, currentSong.track.preference, 'track')}
+            {LikeModule(handleTrackDislike, handleTrackLike, currentSong.preference, 'track')}
 
 
             <div className="btn-group mx-2" role="group" aria-label="audio controls">

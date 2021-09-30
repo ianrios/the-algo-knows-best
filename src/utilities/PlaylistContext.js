@@ -29,15 +29,22 @@ export const PlaylistHelper = () => {
     function mapUserDataToPlaylist(userData, setPlaylist) {
         if (userData.track_statistics && userData.track_statistics.length > 0) {
             setPlaylist(prevPlaylist => prevPlaylist.map(currentTrack => {
+                let userDataCopy = { ...userData }
                 let newPlaylistTrack = { ...currentTrack }
                 let trackStatisticIndex = userData.track_statistics.findIndex(trackStatistic => trackStatistic.track_id === newPlaylistTrack.id)
-                let newTrack = { ...newPlaylistTrack.track }
+                // let newTrack = { ...newPlaylistTrack.track }
+
+                let userTrackStatistics = [...userDataCopy.track_statistics]
+
+                let userTrackStatistic = { ...userTrackStatistics[trackStatisticIndex] }
 
                 // console.log('map user data to playlist', newPlaylistTrack.id)
                 // console.log(userData.track_statistics[trackStatisticIndex].preference)
-                newTrack.preference = userData.track_statistics[trackStatisticIndex].preference
 
-                newPlaylistTrack.track = newTrack
+                // let newTrackStatistic = { ...userData.track_statistics[trackStatisticIndex] }
+                // newTrack.preference = newTrackStatistic.preference
+
+                newPlaylistTrack.preference = userTrackStatistic.preference
                 return newPlaylistTrack
             }))
         }
@@ -53,12 +60,13 @@ export const PlaylistHelper = () => {
                     rating: 0,
                     // order: to be created based on final resulting index in array
                     // playlist_id: to be created on backend,
+                    preference: 0, //
                     listener_count: 0, //
                     placement_liked: 0, // 0 neutral, 1 positive, -1 negative
                     play_count: 0.0, // percent listened based on skips, pauses, loops, or restarts
                     track: {
                         id: id,
-                        preference: 0, // 0 neutral, 1 positive, -1 negative
+                        preference: 0, // 0 neutral, 1 positive, -1 negative TODO: remove from track, move up to playlistTrack
                         song_length: songLength,
                         file_name: `T00${id > 9 ? id : "0" + id}.wav`
                     }
@@ -90,8 +98,13 @@ export const PlaylistHelper = () => {
             item.rating = 0
             item.listener_count = 0
             item.placement_liked = 0
+            // item.preference = 0
             item.play_count = 0.0
-            item.track.preference = 0
+
+            let track = { ...item.track }
+            // track.preference = 0
+
+            item.track = track
 
             return item
         })
@@ -153,14 +166,15 @@ export const PlaylistHelper = () => {
 
 
     // save new playlist to database
-    function saveNewPlaylist(data, token, newPlaylist, failureMethod) {
+    function saveNewPlaylist(data, token, newPlaylist, failureMethod, setPlaylist = () => console.log("setting playlist")) {
 
         // TODO: figure out why token is not getting sent from authContext
         let lsToken = window.localStorage.getItem('token');
 
-        const successMethod = () => {
+        const successMethod = async () => {
             newPlaylist()
             getFinalPlaylistNextResult()
+            setPlaylist(prev => [...shufflePlaylist(data.playlistData)])
         }
         console.log({ data, token, lsToken })
         axiosHelper({

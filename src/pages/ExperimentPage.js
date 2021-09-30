@@ -8,7 +8,7 @@ import useDeepCompareEffect from 'use-deep-compare-effect'
 
 export default function ExperimentPage() {
   const { updateUser, userData } = useAuth()
-  const {mapUserDataToPlaylist, generateOrderedPlaylist, shufflePlaylist } = usePlaylist()
+  const { mapUserDataToPlaylist, generateOrderedPlaylist, shufflePlaylist } = usePlaylist()
   // TODO: map user data for likes to current playlist tracks for conditional rendering
 
   const [shuffledPlaylist, setShuffledPlaylist] = useState(shufflePlaylist(generateOrderedPlaylist()))
@@ -17,10 +17,19 @@ export default function ExperimentPage() {
   useEffect(() => {
     updateUser()
   }, [])
+  useDeepCompareEffect(() => {
+    console.log({ shuffledPlaylist })
+  }, [shuffledPlaylist])
 
   useDeepCompareEffect(() => {
-    mapUserDataToPlaylist(userData, setShuffledPlaylist)
+    if (userData) {
+      mapUserDataToPlaylist(userData, setShuffledPlaylist)
+    }
   }, [userData])
+
+  const saveAndViewResults = () => {
+
+  }
 
   return (
     <>
@@ -48,8 +57,10 @@ export default function ExperimentPage() {
       <Row>
         <Col className="my-4">
           <p>You are currently listening to a traditional Fisher-Yates Shuffle Algorithm.</p>
-          <p>All data is recorded and will affect the resulting algorithmically generated playlist in real time.</p>
-          <Link to='/results' className="link-dark">View Results</Link>
+          <p>All saved data is recorded and will affect the resulting algorithmically generated playlist in real time.</p>
+          {/* TODO: make it so that it works on did unmount */}
+          {/* Save Data and <button onClick={saveAndViewResults} className="link-dark">View Results</button> */}
+          Save Data and <Link to='/results' className="link-dark">View Results</Link>
         </Col>
       </Row>
     </>

@@ -25,7 +25,7 @@ export const AuthHelper = () => {
   }
 
   function saveToken(data) {
-    console.log("token:", data)
+    // console.log("token:", data)
     setToken(prevToken => data);
     window.localStorage.setItem('token', data)
   }

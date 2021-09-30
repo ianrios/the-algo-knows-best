@@ -17,8 +17,7 @@ ReactDOM.render(
   <React.StrictMode>
     <AuthProvider>
       <PlaylistProvider>
-        <Router
-        >
+        <Router>
           <ScrollToTop />
           <App />
         </Router>
