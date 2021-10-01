@@ -14,7 +14,6 @@ export default function ExperimentPage() {
   const { mapUserDataToPlaylist, generateOrderedPlaylist, shufflePlaylist,
     // saveNewPlaylist
   } = usePlaylist()
-  // TODO: map user data for likes to current playlist tracks for conditional rendering
 
   const [shuffledPlaylist, setShuffledPlaylist] = useState(shufflePlaylist(generateOrderedPlaylist()))
 
@@ -46,10 +45,8 @@ export default function ExperimentPage() {
     <>
       <Row>
         <Col>
-          <h1>
-            Random Playlist Stream
-          </h1>
-          <p>
+          <h1>Random Playlist Stream</h1>
+          <p className="d-none d-md-block">
             Listen to the stream to participate; feel free to re-shuffle the playlist, rate a song, replay, skip, or stop listening whenever!
           </p>
         </Col>
@@ -67,6 +64,9 @@ export default function ExperimentPage() {
       </Row>
       <Row>
         <Col className="my-4">
+          <p className="d-sm-block d-md-none">
+            Listen to the stream to participate; feel free to re-shuffle the playlist, rate a song, replay, skip, or stop listening whenever!
+          </p>
           <p>You are currently listening to a traditional Fisher-Yates Shuffle Algorithm.</p>
           <p>All saved data is recorded and will affect the resulting algorithmically generated playlist in real time.</p>
           {/* TODO: make it so that it works on did unmount */}

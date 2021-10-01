@@ -5,6 +5,7 @@ import {
 } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import AudioPlaylist from '../components/AudioPlaylist'
+import Icon from '../components/Icon'
 import { usePlaylist } from '../utilities/PlaylistContext'
 // import { useAuth } from '../utilities/AuthContext'
 
@@ -14,13 +15,16 @@ export default function ResultsPage() {
 	const [currentSongIndex, setCurrentSongIndex] = useState(0)
 
 	// TODO: if playlist updates, dont reset the current song until after it finishes if the current song changes too
-	// TODO: add "last updated at" timestamp
-	// TODO: map the rest of these table items
 	// TODO: use css to show table rows swapping with a smooth transition
+	let totalPlayTime = 0
+	let totalInteractions = 0
+	const startDate = (finalPlaylistResult.length > 0 && finalPlaylistResult[0].created_at) ? finalPlaylistResult[0].created_at.split('T')[0] : 0
 	const mappedData = finalPlaylistResult
 		.sort((a, b) => a.rank - b.rank)
 		.map((item, index) => {
-			// console.log(item)
+			let currentTimeListened = parseFloat(item.play_count.toFixed(1))
+			totalPlayTime += currentTimeListened
+			totalInteractions += parseInt(item.interactions)
 			return (
 				<tr key={index} className={`${index === currentSongIndex ? "table-primary" : ""}`}>
 					<th scope="row">{item.rank}</th>
@@ -34,17 +38,16 @@ export default function ResultsPage() {
 					<td>{item.interactions}</td>
 
 					{/* TODO: use a progress bar to show rating */}
-					<td>{item.play_count.toFixed(1)}</td>
+					<td>{currentTimeListened}</td>
 				</tr>
 			)
 		})
-	// TODO: show "you are viewing data collected from x date to y date"
 	return (
 		<>
 			<Row>
 				<Col>
 					<h1>Algorithmically Generated Playlist</h1>
-					<p>Listen to the resulting pseudo-randomized playlist based on user preference and retention - updated as data is recorded.</p>
+					<p className=''>Listen to the resulting pseudo-randomized playlist based on user preference and retention - updated as data is recorded.</p>
 				</Col>
 			</Row>
 			<Row>
@@ -63,7 +66,8 @@ export default function ResultsPage() {
 					<p>View the data collected from the experiment that is used to generate to the current playlist. <Link className="link-dark" to="/stream">Participate now</Link> to change the data in real time.</p>
 					{finalPlaylistResult.length ? (
 
-						<table className="table table-striped">
+						<table className="table table-striped table-hover">
+							<caption>Listener data since {startDate}</caption>
 							<thead>
 								<tr>
 									<th scope="col">
@@ -76,15 +80,19 @@ export default function ResultsPage() {
 											}
 										>
 											<span>
-												{/* <span className="d-none d-md-block w-25">ML{" "}</span> */}Ranking
+												{/* <span className="d-none d-md-block w-25">ML{" "}</span> */}
+												<Icon type='arrow-down-up' />
+												<span className="d-none d-sm-block d-md-none">Rank</span>
+												<span className="d-none d-md-block">Ranking</span>
 												<span className="d-none d-lg-block w-50"><Link to='/info'>Learn More</Link></span>
 											</span>
 										</OverlayTrigger>
 									</th>
 									{/* <th scope="col">Playing Now</th> */}
 									<th scope="col">
+										<Icon type='music-note-list' />
 										<span className="d-none d-lg-block">Original</span>
-										<span className="d-md-none d-sm-block">Order</span>
+										<span className="d-none d-md-none d-sm-block">Order</span>
 										<span className="d-none d-md-block">Tracklist</span>
 										<span className="d-none d-xl-block">Placement</span>
 									</th>
@@ -97,7 +105,11 @@ export default function ResultsPage() {
 												</Tooltip>
 											}
 										>
-											<span><span className="d-none d-md-block w-25">Unique</span>Listeners</span>
+											<span>
+												<Icon type='people' />
+												<span className="d-none d-md-block w-25">Unique</span>
+												<span className="d-none d-sm-block">Listeners</span>
+											</span>
 										</OverlayTrigger>
 									</th>
 									<th scope="col">
@@ -109,13 +121,18 @@ export default function ResultsPage() {
 												</Tooltip>
 											}
 										>
-											<span>Rating
+											<span>
+												<Icon type='heart-half' />
+												<span className="d-none d-sm-block">Rating</span>
 												{/* <span className="d-none d-lg-block w-25">{" "}(Popularity)</span> */}
 											</span>
 										</OverlayTrigger>
 									</th>
 									<th scope="col">
-										Interactions
+										<span>
+											<Icon type='hand-index-thumb' />
+											<span className="d-none d-sm-block">Interactions</span>
+										</span>
 									</th>
 									<th scope="col">
 										<OverlayTrigger
@@ -126,7 +143,11 @@ export default function ResultsPage() {
 												</Tooltip>
 											}
 										>
-											<span>Plays</span>
+											<span>
+												<Icon type='hourglass-split' />
+												{/* <Icon type='clock-history' /> */}
+												<span className="d-none d-sm-block">Plays</span>
+											</span>
 										</OverlayTrigger>
 									</th>
 								</tr>
@@ -134,6 +155,25 @@ export default function ResultsPage() {
 							<tbody>
 								{mappedData}
 							</tbody>
+							<tfoot>
+								<tr>
+									<th>
+										#
+									</th>
+									<th>
+									</th>
+									<th>
+									</th>
+									<th>
+									</th>
+									<th>
+										{totalInteractions}
+									</th>
+									<th>
+										{totalPlayTime}
+									</th>
+								</tr>
+							</tfoot>
 						</table>
 					) : (
 						<Row>

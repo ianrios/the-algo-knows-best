@@ -195,7 +195,6 @@ export default function AudioPlaylist(props) {
   }
 
   // liked status code
-  // TODO: convert to integer to better integrate with database
   const [playlistPreference, setPlaylistPreference] = useState(0)
   const handlePlaylistLike = () => {
     setPlaylistPreference(prevStatus => prevStatus === 1 ? 0 : 1)
@@ -299,14 +298,14 @@ export default function AudioPlaylist(props) {
                 <span className="badge bg-secondary rounded-pill float-right">
                   {playlist.length - index - 1}</span> songs left
               </small>
-              {/* TODO: move like/dislike song here */}
               {/* TODO: add ability to like/dislike placement here */}
               <hr />
               <div className=" d-flex justify-content-end">
-                <div className="d-flex align-items-center">
+
+                <div className="d-flex align-items-center fw-bold mx-2">
                   Save and View Results
                 </div>
-                <div className="btn-group mx-2" role="group" aria-label="audio controls">
+                <div className="btn-group" role="group" aria-label="audio controls">
                   <OverlayTrigger
                     placement="top"
                     overlay={
@@ -320,6 +319,7 @@ export default function AudioPlaylist(props) {
                     </button>
                   </OverlayTrigger>
                 </div>
+
               </div>
             </div>
           </div>
@@ -368,7 +368,7 @@ export default function AudioPlaylist(props) {
               </OverlayTrigger>
             </div>
             {LikeModule(handleTrackDislike, handleTrackLike, currentSong.preference, 'track')}
-            <div className="btn-group mx-2" role="group" aria-label="audio controls">
+            <div className="btn-group" role="group" aria-label="audio controls">
               <OverlayTrigger
                 placement="top"
                 overlay={
@@ -417,7 +417,7 @@ export default function AudioPlaylist(props) {
         secondaryButtonClickHandler={closeShuffleModal}
         likeModule={LikeModule(handlePlaylistDislike, handlePlaylistLike, playlistPreference, 'shuffle modal')}
         titleText={"New Playist?"}
-        bodyText={"By pressing the shuffle button, your listening experience will be re-crafted with a new randomly generated tracklist."}
+        bodyText={<>By pressing the shuffle button, your listening experience will be re-crafted with a new randomly generated tracklist.<br /><span>Your data will be saved.</span></>}
         primaryBtnText={"Continue"}
         secondaryBtnText={"Back"}
         show={showShuffleModal}
