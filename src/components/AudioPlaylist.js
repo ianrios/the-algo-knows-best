@@ -52,6 +52,21 @@ export default function AudioPlaylist(props) {
     handleShuffle()
   }
 
+
+  const handleSaveAndLeave = () => {
+    const data = {
+      preference: playlistPreference,
+      playlistData: JSON.parse(JSON.stringify(playlist))
+    }
+    const leave = () => {
+      newPlaylist()
+      history.push('/results')
+      console.log('pushed to results page')
+    }
+
+    saveNewPlaylist(data, token, leave, destroyStorage, props.setPlaylist)
+  }
+
   // Audio Object Code
   const handleShuffle = () => {
     const data = {
@@ -114,7 +129,7 @@ export default function AudioPlaylist(props) {
   useEffect(() => {
     if (currentSong) {
       setListenInterval(prevInterval => {
-        let newInterval = Math.floor(currentSong.track.song_length / 10)
+        let newInterval = Math.floor(currentSong.song_length / 10)
         if (prevInterval !== newInterval) {
           return newInterval
         }
@@ -131,8 +146,9 @@ export default function AudioPlaylist(props) {
       props.setPlaylist(prevPlaylist => {
         return prevPlaylist.map(prevPlaylistTrack => {
           let playlistTrack = { ...prevPlaylistTrack };
-          if (playlistTrack.track.file_name === currentSong.track.file_name) {
+          if (playlistTrack.file_name === currentSong.file_name) {
             playlistTrack.play_count += .1;
+            console.log('incrememneted play count: ' + playlistTrack.play_count + '\nfor file: ' + playlistTrack.file_name)
           }
           return playlistTrack;
         })
@@ -217,7 +233,7 @@ export default function AudioPlaylist(props) {
   const LikeModule = (dislikeMethod, likeMethod, state, location) => {
     console.log('rendering like module in ' + location + " :", state)
     return (
-      <div className="btn-group" role="group" aria-label="popularity controls">
+      <div className="btn-group" role="group" aria-label={location + " popularity controls"}>
         <button type="button" className="btn btn-outline-primary" onClick={dislikeMethod}>
           {(state === 0 || state === 1) && <Icon type='hand-thumbs-down' />}
           {state === -1 && <Icon type='hand-thumbs-down-fill' />}
@@ -248,7 +264,7 @@ export default function AudioPlaylist(props) {
     currentSong && props.playlist.length > 0 ? <>
       {(!!!props.generating) ?
         <>
-          <h5>Currently Playing: Song {currentSong.track.id}</h5>
+          <h5>Currently Playing: Song {currentSong.id}</h5>
           <ReactAudioPlayer
             onEnded={handleEnded}
             onListen={handleListen}
@@ -258,7 +274,7 @@ export default function AudioPlaylist(props) {
             onSeeked={handleSeeked}
             onVolumeChanged={handleVolumeChanged}
             loop={false}
-            src={'./audio/' + currentSong.track.file_name}
+            src={'./audio/' + currentSong.file_name}
             listenInterval={listenInterval}
             className="w-100 rounded"
             autoPlay
@@ -271,7 +287,7 @@ export default function AudioPlaylist(props) {
           <div className="card-body">
             <h5 className="card-title">Song {currentSong.track.id}</h5>
             <p className="card-text">Original track order used for song title</p>
-            <p className="card-text d-flex flex-column">
+            <div className="card-text d-flex flex-column">
               <small className="text-muted">
                 Track {index + 1} of {playlist.length} in shuffled playlist
               </small>
@@ -281,7 +297,27 @@ export default function AudioPlaylist(props) {
               </small>
               {/* TODO: move like/dislike song here */}
               {/* TODO: add ability to like/dislike placement here */}
-            </p>
+              <hr />
+              <div className=" d-flex justify-content-end">
+                <div className="d-flex align-items-center">
+                  Save and View Results
+                </div>
+                <div className="btn-group mx-2" role="group" aria-label="audio controls">
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id={`tooltip-top`}>
+                        Save Your Playlist and View Results
+                      </Tooltip>
+                    }
+                  >
+                    <button type="button" className="btn btn-outline-primary" onClick={handleSaveAndLeave}>
+                      <Icon type='save' />
+                    </button>
+                  </OverlayTrigger>
+                </div>
+              </div>
+            </div>
           </div>
           <div className="card-footer d-flex justify-content-between">
             <ReactAudioPlayer
@@ -293,7 +329,7 @@ export default function AudioPlaylist(props) {
               onSeeked={handleSeeked}
               onVolumeChanged={handleVolumeChanged}
               loop={looped}
-              src={'./audio/' + currentSong.track.file_name}
+              src={'./audio/' + currentSong.file_name}
               listenInterval={listenInterval}
               className="w-100 rounded"
               autoPlay
@@ -327,10 +363,7 @@ export default function AudioPlaylist(props) {
                 </button>
               </OverlayTrigger>
             </div>
-
             {LikeModule(handleTrackDislike, handleTrackLike, currentSong.preference, 'track')}
-
-
             <div className="btn-group mx-2" role="group" aria-label="audio controls">
               <OverlayTrigger
                 placement="top"

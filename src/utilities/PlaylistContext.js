@@ -64,6 +64,9 @@ export const PlaylistHelper = () => {
                     listener_count: 0, //
                     placement_liked: 0, // 0 neutral, 1 positive, -1 negative
                     play_count: 0.0, // percent listened based on skips, pauses, loops, or restarts
+                    file_name: `T00${id > 9 ? id : "0" + id}.wav`,
+                    song_length: songLength,
+                    interactions: 0,
                     track: {
                         id: id,
                         preference: 0, // 0 neutral, 1 positive, -1 negative TODO: remove from track, move up to playlistTrack
@@ -146,9 +149,12 @@ export const PlaylistHelper = () => {
                     // if current song has ended
                     return nextPlaylist
                 }
-                if (prevFinalPlaylistResult[currentSongIndex].track.file_name === nextPlaylist[currentSongIndex].track.file_name) {
-                    // if current song is the same index in both arrays
-                    return nextPlaylist
+                if (nextPlaylist[currentSongIndex].track) {
+
+                    if (prevFinalPlaylistResult[currentSongIndex].track.file_name === nextPlaylist[currentSongIndex].track.file_name) {
+                        // if current song is the same index in both arrays
+                        return nextPlaylist
+                    }
                 }
                 else {
                     // songs do not match, but we still need the data

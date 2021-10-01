@@ -1,5 +1,6 @@
 import React from 'react'
 import { Button, Modal, Row, Col } from 'react-bootstrap'
+import Icon from './Icon';
 
 export default function BootstrapModal(props) {
 
@@ -26,6 +27,7 @@ export default function BootstrapModal(props) {
                     {props.secondaryBtnText}
                 </Button>
                 <Button variant="primary" onClick={props.primaryButtonClickHandler}>
+                    <span className='me-2'><Icon type="save" /></span>
                     {props.primaryBtnText}
                 </Button>
             </Modal.Footer>

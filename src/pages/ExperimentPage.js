@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Row, Col } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import {
+  Link,
+  // useHistory
+} from 'react-router-dom'
 import AudioPlaylist from '../components/AudioPlaylist'
 import { useAuth } from '../utilities/AuthContext'
 import { usePlaylist } from '../utilities/PlaylistContext'
@@ -8,15 +11,19 @@ import useDeepCompareEffect from 'use-deep-compare-effect'
 
 export default function ExperimentPage() {
   const { updateUser, userData } = useAuth()
-  const { mapUserDataToPlaylist, generateOrderedPlaylist, shufflePlaylist } = usePlaylist()
+  const { mapUserDataToPlaylist, generateOrderedPlaylist, shufflePlaylist,
+    // saveNewPlaylist
+  } = usePlaylist()
   // TODO: map user data for likes to current playlist tracks for conditional rendering
 
   const [shuffledPlaylist, setShuffledPlaylist] = useState(shufflePlaylist(generateOrderedPlaylist()))
 
   const [currentSongIndex, setCurrentSongIndex] = useState(0)
+
   useEffect(() => {
     updateUser()
   }, [])
+
   useDeepCompareEffect(() => {
     console.log({ shuffledPlaylist })
   }, [shuffledPlaylist])
@@ -27,9 +34,12 @@ export default function ExperimentPage() {
     }
   }, [userData])
 
-  const saveAndViewResults = () => {
+  // const history = useHistory()
 
-  }
+  // const saveAndViewResults = () => {
+  //   saveNewPlaylist()
+  //   history.push('/results')
+  // }
 
   return (
     <>
@@ -60,7 +70,7 @@ export default function ExperimentPage() {
           <p>All saved data is recorded and will affect the resulting algorithmically generated playlist in real time.</p>
           {/* TODO: make it so that it works on did unmount */}
           {/* Save Data and <button onClick={saveAndViewResults} className="link-dark">View Results</button> */}
-          Save Data and <Link to='/results' className="link-dark">View Results</Link>
+          {/* Save Data and <Link to='/results' className="link-dark">View Results</Link> */}
         </Col>
       </Row>
     </>

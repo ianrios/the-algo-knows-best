@@ -11,7 +11,7 @@ export default function HomePage() {
         <div className="row px-2">
           <div className="col-sm-12 col-md-9 bg-light rounded-2 mb-2 p-2">
             <p className="lead">
-              Using machine learning, user-created listening patterns emerge from randomness based on preference, retention time, and skips, among other metrics built into modern-day shuffling algorithms such as song popularity and length.
+              Using streaming data, user-created listening patterns emerge from randomness based on preference, retention time, and skips, among other metrics built into modern-day shuffling algorithms such as song popularity and length.
             </p>
             <p className="lead">
               <Link to="/info" className="link-secondary">Read more...</Link>

@@ -17,16 +17,18 @@ export default function ResultsPage() {
 	const mappedData = finalPlaylistResult
 		.sort((a, b) => a.rank - b.rank)
 		.map((item, index) => {
+			console.log(item)
 			return (
 				<tr key={index} className={`${index === currentSongIndex ? "table-primary" : ""}`}>
 					<th scope="row">{item.rank}</th>
-					<td>{item.track.id}</td>
+					<td>{item.id}</td>
 					<td>{item.listener_count}</td>
 					<td>
 						{/* <ProgressBar now={item.rating} /> */}
 						{/* out of 100 */}
 						{item.rating}
 					</td>
+					<td>{item.interactions}</td>
 
 					{/* TODO: use a progress bar to show rating */}
 					<td>{item.play_count.toFixed(1)}</td>
@@ -71,7 +73,7 @@ export default function ResultsPage() {
 											}
 										>
 											<span>
-												<span className="d-none d-md-block w-25">ML{" "}</span>Ranking
+												{/* <span className="d-none d-md-block w-25">ML{" "}</span> */}Ranking
 												<span className="d-none d-lg-block w-50"><Link to='/info'>Learn More</Link></span>
 											</span>
 										</OverlayTrigger>
@@ -108,6 +110,9 @@ export default function ResultsPage() {
 												{/* <span className="d-none d-lg-block w-25">{" "}(Popularity)</span> */}
 											</span>
 										</OverlayTrigger>
+									</th>
+									<th scope="col">
+										Interactions
 									</th>
 									<th scope="col">
 										<OverlayTrigger
