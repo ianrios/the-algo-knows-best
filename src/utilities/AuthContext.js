@@ -135,6 +135,7 @@ export const AuthHelper = () => {
         token
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token])
 
 

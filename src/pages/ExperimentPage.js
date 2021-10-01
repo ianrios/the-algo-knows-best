@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Row, Col } from 'react-bootstrap'
-import {
-  Link,
-  // useHistory
-} from 'react-router-dom'
+// import {
+//   Link,
+//   // useHistory
+// } from 'react-router-dom'
 import AudioPlaylist from '../components/AudioPlaylist'
 import { useAuth } from '../utilities/AuthContext'
 import { usePlaylist } from '../utilities/PlaylistContext'
@@ -22,11 +22,12 @@ export default function ExperimentPage() {
 
   useEffect(() => {
     updateUser()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useDeepCompareEffect(() => {
-    console.log({ shuffledPlaylist })
-  }, [shuffledPlaylist])
+  // useDeepCompareEffect(() => {
+  //   // console.log({ shuffledPlaylist })
+  // }, [shuffledPlaylist])
 
   useDeepCompareEffect(() => {
     if (userData) {

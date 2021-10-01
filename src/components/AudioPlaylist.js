@@ -13,11 +13,13 @@ export default function AudioPlaylist(props) {
   const currentSong = playlist[index]
 
   const { saveNewPlaylist, getFinalPlaylistNextResult, updatePlaylistData } = usePlaylist()
-  const { token, destroyStorage, updateUser, saveTokenFromLS } = useAuth()
+  const { token, destroyStorage,
+    //  updateUser,
+    saveTokenFromLS } = useAuth()
 
   useEffect(() => {
     saveTokenFromLS()
-    console.log("on mount of audio", { token })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token])
 
   const history = useHistory()
@@ -61,7 +63,7 @@ export default function AudioPlaylist(props) {
     const leave = () => {
       newPlaylist()
       history.push('/results')
-      console.log('pushed to results page')
+      // console.log('pushed to results page')
     }
 
     saveNewPlaylist(data, token, leave, destroyStorage, props.setPlaylist)
@@ -124,6 +126,7 @@ export default function AudioPlaylist(props) {
   useEffect(() => {
     getFinalPlaylistNextResult()
     updatePlaylistData(index, !!props.generating, true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listenInterval])
 
   useEffect(() => {
@@ -136,6 +139,7 @@ export default function AudioPlaylist(props) {
         return prevInterval
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, currentSong])
 
   // listen interval code
@@ -148,7 +152,7 @@ export default function AudioPlaylist(props) {
           let playlistTrack = { ...prevPlaylistTrack };
           if (playlistTrack.file_name === currentSong.file_name) {
             playlistTrack.play_count += .1;
-            console.log('incrememneted play count: ' + playlistTrack.play_count + '\nfor file: ' + playlistTrack.file_name)
+            // console.log('incrememneted play count: ' + playlistTrack.play_count + '\nfor file: ' + playlistTrack.file_name)
           }
           return playlistTrack;
         })
@@ -223,15 +227,15 @@ export default function AudioPlaylist(props) {
       return mappedPlaylist
     })
   }
-  const handlePlacementLike = () => {
-    // setPlaylistPreference(prevStatus => prevStatus === 1 ? 0 : 1)
-  }
-  const handlePlacementDislike = () => {
-    // setPlaylistPreference(prevStatus => prevStatus === -1 ? 0 : -1)
-  }
+  // const handlePlacementLike = () => {
+  //   // setPlaylistPreference(prevStatus => prevStatus === 1 ? 0 : 1)
+  // }
+  // const handlePlacementDislike = () => {
+  //   // setPlaylistPreference(prevStatus => prevStatus === -1 ? 0 : -1)
+  // }
 
   const LikeModule = (dislikeMethod, likeMethod, state, location) => {
-    console.log('rendering like module in ' + location + " :", state)
+    // console.log('rendering like module in ' + location + " :", state)
     return (
       <div className="btn-group" role="group" aria-label={location + " popularity controls"}>
         <button type="button" className="btn btn-outline-primary" onClick={dislikeMethod}>
@@ -245,20 +249,20 @@ export default function AudioPlaylist(props) {
       </div>
     )
   }
-  useEffect(() => {
-    // Component Will Unmount  
-    // TODO: this might be breaking the code
-    // return function cleanup() {
-    //   if (!!props.generating) {
-    //     const data = {
-    //       preference: playlistPreference,
-    //       playlistData: JSON.parse(JSON.stringify(playlist))
-    //     }
-    //     saveNewPlaylist(data, token, newPlaylist, destroyStorage)
-    //   }
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  // Component Will Unmount  
+  // TODO: this might be breaking the code
+  // return function cleanup() {
+  //   if (!!props.generating) {
+  //     const data = {
+  //       preference: playlistPreference,
+  //       playlistData: JSON.parse(JSON.stringify(playlist))
+  //     }
+  //     saveNewPlaylist(data, token, newPlaylist, destroyStorage)
+  //   }
+  // }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   return (
     currentSong && props.playlist.length > 0 ? <>

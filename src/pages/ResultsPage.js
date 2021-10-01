@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
-import { Row, Col, OverlayTrigger, Tooltip, Spinner, ProgressBar } from 'react-bootstrap'
+import {
+	Row, Col, OverlayTrigger, Tooltip, Spinner,
+	//  ProgressBar 
+} from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import AudioPlaylist from '../components/AudioPlaylist'
 import { usePlaylist } from '../utilities/PlaylistContext'
-import { useAuth } from '../utilities/AuthContext'
+// import { useAuth } from '../utilities/AuthContext'
 
 export default function ResultsPage() {
 	const { finalPlaylistResult } = usePlaylist()
@@ -17,7 +20,7 @@ export default function ResultsPage() {
 	const mappedData = finalPlaylistResult
 		.sort((a, b) => a.rank - b.rank)
 		.map((item, index) => {
-			console.log(item)
+			// console.log(item)
 			return (
 				<tr key={index} className={`${index === currentSongIndex ? "table-primary" : ""}`}>
 					<th scope="row">{item.rank}</th>

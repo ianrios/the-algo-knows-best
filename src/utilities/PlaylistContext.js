@@ -172,7 +172,7 @@ export const PlaylistHelper = () => {
 
 
     // save new playlist to database
-    function saveNewPlaylist(data, token, newPlaylist, failureMethod, setPlaylist = () => console.log("setting playlist")) {
+    function saveNewPlaylist(data, token, newPlaylist, failureMethod, setPlaylist = () => "setting playlist") {
 
         // TODO: figure out why token is not getting sent from authContext
         let lsToken = window.localStorage.getItem('token');
@@ -182,7 +182,7 @@ export const PlaylistHelper = () => {
             getFinalPlaylistNextResult()
             setPlaylist(prev => [...shufflePlaylist(data.playlistData)])
         }
-        console.log({ data, token, lsToken })
+        // console.log({ data, token, lsToken })
         axiosHelper({
             data,
             method: 'post',
