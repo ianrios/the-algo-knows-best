@@ -27,7 +27,7 @@ export default function ResultsPage() {
 			totalInteractions += parseInt(item.interactions)
 			return (
 				<tr key={index} className={`${index === currentSongIndex ? "table-primary" : ""}`}>
-					<th scope="row">{item.rank}</th>
+					<th scope="row">{item.rank + 1}</th>
 					<td>{item.id}</td>
 					<td>{item.listener_count}</td>
 					<td>
