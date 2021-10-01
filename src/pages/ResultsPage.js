@@ -22,7 +22,7 @@ export default function ResultsPage() {
 	const mappedData = finalPlaylistResult
 		.sort((a, b) => a.rank - b.rank)
 		.map((item, index) => {
-			let currentTimeListened = parseFloat(item.play_count.toFixed(1))
+			let currentTimeListened = parseFloat(item.play_count)
 			totalPlayTime += currentTimeListened
 			totalInteractions += parseInt(item.interactions)
 			return (
@@ -38,7 +38,7 @@ export default function ResultsPage() {
 					<td>{item.interactions}</td>
 
 					{/* TODO: use a progress bar to show rating */}
-					<td>{currentTimeListened}</td>
+					<td>{currentTimeListened.toFixed(1)}</td>
 				</tr>
 			)
 		})
@@ -170,7 +170,7 @@ export default function ResultsPage() {
 										{totalInteractions}
 									</th>
 									<th>
-										{totalPlayTime}
+										{totalPlayTime.toFixed(1)}
 									</th>
 								</tr>
 							</tfoot>
