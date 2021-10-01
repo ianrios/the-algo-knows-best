@@ -67,8 +67,8 @@ export default function ExperimentPage() {
           <p className="d-sm-block d-md-none">
             Listen to the stream to participate; feel free to re-shuffle the playlist, rate a song, replay, skip, or stop listening whenever!
           </p>
-          <p>You are currently listening to a traditional Fisher-Yates Shuffle Algorithm.</p>
           <p>All saved data is recorded and will affect the resulting algorithmically generated playlist in real time.</p>
+          <p>You are currently listening to a traditional Fisher-Yates Shuffle Algorithm.</p>
           {/* TODO: make it so that it works on did unmount */}
           {/* Save Data and <button onClick={saveAndViewResults} className="link-dark">View Results</button> */}
           {/* Save Data and <Link to='/results' className="link-dark">View Results</Link> */}

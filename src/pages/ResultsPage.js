@@ -47,7 +47,7 @@ export default function ResultsPage() {
 			<Row>
 				<Col>
 					<h1>Algorithmically Generated Playlist</h1>
-					<p className=''>Listen to the resulting pseudo-randomized playlist based on user preference and retention - updated as data is recorded.</p>
+					<p>Listen to the resulting generated playlist based on user preference and retention.</p>
 				</Col>
 			</Row>
 			<Row>
@@ -182,6 +182,8 @@ export default function ResultsPage() {
 							</Col>
 						</Row>
 					)}
+					<p>Updated on backend as data is saved by a listener</p>
+					<p>Updated on front end after a song ends to avoid clicks.</p>
 				</Col>
 			</Row>
 		</>
