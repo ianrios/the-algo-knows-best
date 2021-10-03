@@ -56,7 +56,7 @@ export const PlaylistHelper = () => {
             return (
                 {
                     id: id, //created on backend, generated for front end using index
-                    rank: id,
+                    rank: index,
                     rating: 0,
                     // order: to be created based on final resulting index in array
                     // playlist_id: to be created on backend,
@@ -94,10 +94,11 @@ export const PlaylistHelper = () => {
         }
 
         // code to reset array statistics
+        let currId = 1
         return arr.map((prevItem, index) => {
             let item = { ...prevItem }
 
-            item.rank = index + 1
+            item.rank = currId
             item.rating = 0
             item.listener_count = 0
             item.placement_liked = 0
@@ -108,6 +109,7 @@ export const PlaylistHelper = () => {
             // track.preference = 0
 
             item.track = track
+            currId++
 
             return item
         })
@@ -168,8 +170,6 @@ export const PlaylistHelper = () => {
             return prevFinalPlaylistResult
         })
     }
-
-
 
     // save new playlist to database
     function saveNewPlaylist(data, token, newPlaylist, failureMethod, setPlaylist = () => "setting playlist") {
