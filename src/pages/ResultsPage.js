@@ -63,7 +63,7 @@ export default function ResultsPage() {
 			<Row>
 				<Col>
 					<h2>Statistics</h2>
-					<p>View the data collected from the experiment that is used to generate to the current playlist. <Link className="link-dark" to="/stream">Participate now</Link> to change the data in real time.</p>
+					<p>View the data collected from the experiment that is used to generate to the current playlist. <span className='fw-bold'><Link className="link-dark" to="/stream">Participate now</Link> to change the data in real time.</span></p>
 					{finalPlaylistResult.length ? (
 
 						<table className="table table-striped table-hover">

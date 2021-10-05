@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Col, Row } from 'react-bootstrap'
-import QRCode from 'react-qr-code';
+import QR from '../components/QR'
 
 export default function HomePage() {
   return (
@@ -52,7 +52,7 @@ export default function HomePage() {
             <p className="lead">As you generate new playlist data, you'll be able to see the resulting algorithmic playlist update in real time.</p>
           </div>
           <div className="col-md-5 text-center mt-3">
-            <QRCode value="https://the-algorithm-knows-best.web.app/" />
+            <QR />
           </div>
         </Row>
       </Col>
